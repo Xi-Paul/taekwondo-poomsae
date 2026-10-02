@@ -1,0 +1,939 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>품새 연습장</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥋</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F5F6F8; --surface:#FFFFFF; --ink:#18203A; --sub:#5A6378; --line:#DCE0E8;
+  --red:#C8102E; --blue:#0F4C9C; --gold:#F2B705; --ok:#2E8B57;
+  --display:"Jua","Noto Sans KR",system-ui,sans-serif;
+  --body:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#121624;--surface:#1B2133;--ink:#EEF1F7;--sub:#A4ADC2;--line:#2C3449;--red:#F0475E;--blue:#6E9EEB}
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:16px/1.6 var(--body);padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+
+header{padding:14px 0 6px}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font:400 1.75rem/1.2 var(--display);margin:0;display:flex;align-items:center;gap:10px}
+h1 .belt{width:34px;height:10px;border-radius:2px;background:var(--pcolor,var(--gold));box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.kids{display:flex;gap:6px}
+.kid{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 16px;font-family:var(--display);font-size:1.1rem;cursor:pointer}
+.kid[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+
+h2{font:400 1.35rem/1.3 var(--display);margin:22px 0 8px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select,input[type=text],input[type=password]{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px}
+select{font-family:var(--display);font-size:1.15rem;flex:1;min-width:0}
+.hint{color:var(--sub);font-size:.9rem;margin:6px 0}
+
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface);margin-top:10px}
+.seg button{border:0;background:none;padding:9px 14px;cursor:pointer;min-height:44px}
+.seg button[aria-pressed="true"]{background:var(--blue);color:#fff}
+
+.stage{position:relative;margin-top:12px;background:#0d1020;border-radius:14px;overflow:hidden;aspect-ratio:3/4;max-height:56vh;width:100%}
+@media (min-width:600px){.stage{aspect-ratio:4/3}}
+.stage video,.stage canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.stage.mirror video,.stage.mirror canvas{transform:scaleX(-1)}
+.stage .msg{position:absolute;left:12px;right:12px;bottom:12px;background:rgba(10,12,24,.72);color:#fff;border-radius:10px;padding:8px 12px;font-family:var(--display);font-size:1.1rem;text-align:center}
+.stage .msg:empty{display:none}
+.stage .count{position:absolute;inset:0;display:grid;place-items:center;font:400 9rem/1 var(--display);color:#fff;text-shadow:0 4px 24px rgba(0,0,0,.5);pointer-events:none}
+.stage .rec{position:absolute;top:12px;left:12px;background:var(--red);color:#fff;border-radius:999px;padding:3px 12px;font-weight:700;font-size:.9rem;display:none}
+.stage.recording .rec{display:block}
+
+.controls{display:flex;gap:8px;margin-top:10px}
+.btn{border:0;border-radius:12px;padding:12px 18px;min-height:52px;cursor:pointer;font-family:var(--display);font-size:1.2rem;background:var(--surface);border:1.5px solid var(--line)}
+.btn.primary{background:var(--red);border-color:var(--red);color:#fff;flex:1}
+.btn.go{background:var(--blue);border-color:var(--blue);color:#fff;flex:1}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* 결과: 도장이 이 화면의 주인공 */
+.result{margin-top:18px;background:var(--surface);border-radius:16px;padding:18px 16px;border:1.5px solid var(--line)}
+.result-top{display:flex;align-items:center;gap:16px}
+.stamp{width:132px;height:132px;flex:none;transform:rotate(-9deg)}
+.stamp text{font-family:var(--display)}
+@media (prefers-reduced-motion:no-preference){
+  .stamp.press{animation:press .42s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes press{from{transform:rotate(-9deg) scale(1.6);opacity:0}to{transform:rotate(-9deg) scale(1);opacity:1}}
+}
+.result-title{font:400 1.5rem/1.3 var(--display);margin:0}
+.items{list-style:none;padding:0;margin:16px 0 0}
+.items li{padding:12px 0;border-top:1px solid var(--line)}
+.items .name{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--display);font-size:1.2rem}
+.stars{color:var(--gold);letter-spacing:2px;font-size:1.3rem}
+.stars .off{color:var(--line)}
+.items p{margin:2px 0 0}
+.evidence{color:var(--sub);font-size:.82rem;margin-top:4px}
+
+.chart{width:100%;height:auto;background:var(--surface);border-radius:12px;border:1.5px solid var(--line)}
+.rec-list{list-style:none;padding:0;margin:12px 0}
+.rec-list li{display:flex;justify-content:space-between;gap:8px;padding:10px 4px;border-bottom:1px solid var(--line)}
+.rec-list .d{color:var(--sub);font-size:.9rem}
+
+.field{display:grid;gap:4px;margin:10px 0}
+.field label{font-weight:500}
+.field input{width:100%}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+nav.tabs .wrap{display:flex}
+nav.tabs button{flex:1;border:0;background:none;padding:12px 0;min-height:60px;font-family:var(--display);font-size:1.1rem;color:var(--sub);cursor:pointer;border-top:3px solid transparent}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--red)}
+/* 오늘 운동 */
+.daynav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px}
+.daynav .date{font:400 1.4rem/1.2 var(--display);text-align:center;flex:1}
+.daynav button{min-width:52px}
+.streak{display:flex;gap:12px;align-items:center;margin-top:10px;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px}
+.streak .big{font:400 2.4rem/1 var(--display);color:var(--red)}
+.streak .bar{flex:1;height:14px;border-radius:7px;background:var(--line);overflow:hidden}
+.streak .bar i{display:block;height:100%;background:var(--gold);transition:width .3s}
+.ex{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:10px}
+.ex li{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.ex li.done{border-color:var(--ok)}
+.ex .nm{flex:1;min-width:0}
+.ex .nm b{display:block;font:400 1.25rem/1.3 var(--display);font-weight:400}
+.ex .nm small{color:var(--sub)}
+.ex .chk{width:56px;height:56px;border-radius:50%;border:3px solid var(--line);background:none;font-size:1.6rem;cursor:pointer;flex:none}
+.ex .chk[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:#fff}
+.ex .cnt{display:flex;align-items:center;gap:6px;flex:none}
+.ex .cnt button{width:44px;height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper);font-size:1.3rem;cursor:pointer}
+.ex .cnt input{width:64px;text-align:center;border:1.5px solid var(--line);border-radius:10px;min-height:44px;background:var(--paper);font-family:var(--display);font-size:1.2rem}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+.cal .h{text-align:center;font-size:.85rem;color:var(--sub)}
+.cal .h:first-child{color:var(--red)}
+.cal button{aspect-ratio:1;border:1.5px solid transparent;border-radius:10px;background:var(--surface);cursor:pointer;display:grid;place-items:center;font-size:.9rem;padding:0;position:relative}
+.cal button.sel{border-color:var(--ink)}
+.cal button.part::after{content:"";position:absolute;bottom:5px;width:7px;height:7px;border-radius:50%;background:var(--gold)}
+.cal button.full{background:var(--red);color:#fff;font-family:var(--display)}
+.cal button.future{opacity:.35;cursor:default}
+.cal .blank{visibility:hidden}
+textarea{width:100%;min-height:64px;background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;color:inherit;resize:vertical}
+/* 다시 보기 */
+.player{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:12px;margin-top:10px}
+.pv-row{display:grid;grid-template-columns:1fr;gap:8px}
+.pv-row.two{grid-template-columns:1fr 1fr}
+.pv{margin:0}
+.pvbox{position:relative;background:#0d1020;border-radius:10px;overflow:hidden;aspect-ratio:3/4}
+.pvbox video,.pvbox canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.pvbox.mirror video,.pvbox.mirror canvas{transform:scaleX(-1)}
+.pv figcaption{font-size:.85rem;color:var(--sub);text-align:center;margin-top:4px}
+.seek{width:100%;margin:10px 0 4px;accent-color:var(--red)}
+.ptime{display:flex;justify-content:space-between;font-size:.8rem;color:var(--sub)}
+.pctl{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pctl button{min-height:44px;min-width:44px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);cursor:pointer;padding:0 10px}
+.pctl button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.pctl .play{background:var(--red);color:#fff;border-color:var(--red);font-size:1.2rem;min-width:64px}
+.pinfo{width:100%;border-collapse:collapse;margin-top:10px;font-size:.92rem}
+.pinfo th,.pinfo td{padding:6px 4px;border-top:1px solid var(--line);text-align:right}
+.pinfo th:first-child,.pinfo td:first-child{text-align:left}
+.vlist{list-style:none;padding:0;margin:8px 0}
+.vlist li{display:flex;align-items:center;gap:8px;padding:10px 2px;border-bottom:1px solid var(--line)}
+.vlist .vt{flex:1;min-width:0}
+.vlist .vt b{display:block;font-weight:500}
+.vlist .vt small{color:var(--sub)}
+.vlist input[type=checkbox]{width:22px;height:22px;accent-color:var(--blue)}
+.vlist button{min-height:40px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;padding:0 10px}
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.quick .btn{font-size:1rem;min-height:44px;padding:8px 14px}
+[hidden]{display:none!important}
+
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;max-width:90vw;z-index:9;font-size:.95rem}
+.toast:empty{display:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1><span class="belt" aria-hidden="true"></span>품새 연습장</h1>
+    <div class="kids" id="kids" role="group" aria-label="누가 연습하나요"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- 오늘 운동 -->
+  <section id="v-daily">
+    <div class="daynav">
+      <button class="btn" id="dPrev" aria-label="전날">‹</button>
+      <div class="date" id="dDate"></div>
+      <button class="btn" id="dNext" aria-label="다음날">›</button>
+    </div>
+    <div class="streak">
+      <div><div class="big" id="dStreak">0</div><small>일 연속</small></div>
+      <div style="flex:1"><div id="dProg" class="hint" style="margin:0 0 6px"></div><div class="bar"><i id="dBar" style="width:0"></i></div></div>
+    </div>
+    <ul class="ex" id="dItems"></ul>
+    <p class="hint" id="dPoomsae"></p>
+    <label class="hint" for="dNote">한 줄 메모</label>
+    <textarea id="dNote" placeholder="오늘 운동하면서 느낀 점"></textarea>
+    <p class="hint" id="dSave"></p>
+    <h2 id="calTitle"></h2>
+    <div class="row" style="justify-content:space-between">
+      <button class="btn" id="cPrev" aria-label="지난달">‹ 지난달</button>
+      <button class="btn" id="cNext" aria-label="다음달">다음달 ›</button>
+    </div>
+    <div class="cal" id="cal"></div>
+    <p class="hint">빨간 날 = 목표를 모두 채운 날, 노란 점 = 조금이라도 운동한 날</p>
+  </section>
+
+  <!-- 품새 연습 -->
+  <section id="v-practice" hidden>
+    <h2>오늘 할 품새</h2>
+    <div class="row"><select id="pSel" aria-label="품새 선택"></select></div>
+    <p class="hint" id="refStatus"></p>
+    <div class="seg" role="group" aria-label="모드">
+      <button id="mPractice" aria-pressed="true">연습하기</button>
+      <button id="mRef" aria-pressed="false">기준 동작 저장 (어른)</button>
+    </div>
+
+    <div class="stage mirror" id="stage">
+      <video id="video" playsinline muted></video>
+      <canvas id="canvas"></canvas>
+      <div class="rec">녹화 중</div>
+      <div class="count" id="count"></div>
+      <div class="msg" id="msg">카메라를 켜고, 머리부터 발끝까지 화면에 들어오게 서 주세요.</div>
+    </div>
+    <div class="controls">
+      <button class="btn go" id="btnCam">카메라 켜기</button>
+      <button class="btn primary" id="btnRec" disabled>시작</button>
+      <button class="btn" id="btnFlip" aria-label="앞뒤 카메라 바꾸기">↺</button>
+    </div>
+
+    <div id="result"></div>
+  </section>
+
+  <!-- 기록 -->
+  <section id="v-records" hidden>
+    <h2>지난 기록</h2>
+    <div class="row"><select id="rSel" aria-label="품새 선택"></select></div>
+    <div id="recBody"></div>
+    <h2>다시 보기</h2>
+    <div id="player"></div>
+    <div id="replayList"></div>
+  </section>
+
+  <!-- 설정 -->
+  <section id="v-settings" hidden>
+    <h2>기록 저장 위치</h2>
+    <p class="hint">GitHub 저장소를 연결하면 어느 기기에서든 기록을 함께 봐요. 비워 두면 이 기기에만 저장돼요.</p>
+    <div class="field"><label for="sOwner">GitHub 사용자 이름</label><input type="text" id="sOwner" autocomplete="off" autocapitalize="off"></div>
+    <div class="field"><label for="sRepo">데이터 저장소 이름</label><input type="text" id="sRepo" autocomplete="off" autocapitalize="off" placeholder="taekwondo-data"></div>
+    <div class="field"><label for="sBranch">브랜치 (비우면 기본 브랜치)</label><input type="text" id="sBranch" autocomplete="off" autocapitalize="off"></div>
+    <div class="field"><label for="sToken">토큰 (Contents 읽기·쓰기)</label><input type="password" id="sToken" autocomplete="off"></div>
+    <div class="controls"><button class="btn go" id="btnSave">저장하고 연결 확인</button></div>
+    <p class="hint" id="sState"></p>
+    <h2>영상 저장 위치</h2>
+    <p class="hint" id="vState"></p>
+    <div class="controls">
+      <button class="btn go" id="btnFolder" hidden>폴더 고르기</button>
+      <button class="btn" id="btnAppStore" hidden>앱 안에 저장</button>
+    </div>
+    <p class="hint">영상은 이 기기에만 저장되고 GitHub에는 올라가지 않아요. 다시 보기 화면의 "내보내기"로 사진첩이나 파일로 옮길 수 있어요.</p>
+    <h2>앱 정보</h2>
+    <p class="hint" id="appInfo"></p>
+  </section>
+</main>
+
+<nav class="tabs" role="tablist">
+  <div class="wrap">
+    <button role="tab" data-v="daily" aria-selected="true">오늘 운동</button>
+    <button role="tab" data-v="practice" aria-selected="false">품새</button>
+    <button role="tab" data-v="records" aria-selected="false">품새 기록</button>
+    <button role="tab" data-v="settings" aria-selected="false">설정</button>
+  </div>
+</nav>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+import { frameFeatures, computeMetrics, compareToReference, starsFor, ANGLES, alignTimes, frameAt } from './js/metrics.js';
+import { VideoStore, canPickFolder, pickRecorderType, fileStamp } from './js/videostore.js';
+import { Store, loadSettings, saveSettings } from './js/store.js';
+
+const MP_VER = '0.10.14';
+const MODEL_URL = (m) => `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_${m}/float16/1/pose_landmarker_${m}.task`;
+const LINKS = [[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28],[27,31],[28,32]];
+const BODY = [11,12,23,24,25,26,27,28];
+// 리플레이 뼈대용으로 저장하는 관절 (x, y, 신뢰도)
+const PTS = [11,12,13,14,15,16,23,24,25,26,27,28,31,32];
+const PLINKS = LINKS.map(([a, b]) => [PTS.indexOf(a), PTS.indexOf(b)]);
+
+const $ = (id) => document.getElementById(id);
+const S = { vs:new VideoStore(), mr:null, chunks:[], recT0:0, recType:null, cfg:null, store:new Store(), child:null, pid:null, mode:'practice', refs:{}, lm:null, stream:null,
+            facing:'user', rec:'idle', frames:[], lastSample:0, lastTs:-1, raf:0, wake:null, timer:0 };
+
+function toast(t, ms = 3500) { $('toast').textContent = t; clearTimeout(toast.h); toast.h = setTimeout(() => ($('toast').textContent = ''), ms); }
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const P = () => S.cfg.poomsae.find((p) => p.id === S.pid);
+const childName = () => S.cfg.children.find((c) => c.id === S.child)?.name ?? '';
+
+// ---------- 설정 파일 (업데이트 지점) ----------
+async function loadConfig() {
+  const r = await fetch(`config/poomsae.json?v=${Date.now()}`, { cache: 'no-store' });
+  if (!r.ok) throw new Error('config/poomsae.json 을 읽지 못했어요.');
+  S.cfg = await r.json();
+}
+
+function renderKids() {
+  $('kids').innerHTML = S.cfg.children.map((c) => `<button class="kid" data-id="${esc(c.id)}" aria-pressed="${c.id === S.child}">${esc(c.name)}</button>`).join('');
+  $('kids').querySelectorAll('.kid').forEach((b) => b.onclick = async () => {
+    await flushDaily();
+    S.child = b.dataset.id; localStorage.setItem('tkd:child', S.child); renderKids(); $('result').innerHTML = '';
+    closeReplay();
+    if (!$('v-records').hidden) renderRecords();
+    if (!$('v-daily').hidden) loadDaily();
+  });
+}
+function renderPoomsaeSelects() {
+  const opts = S.cfg.poomsae.map((p) => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+  $('pSel').innerHTML = opts; $('rSel').innerHTML = opts;
+  $('pSel').value = S.pid; $('rSel').value = S.pid;
+  document.documentElement.style.setProperty('--pcolor', P()?.color || '#F2B705');
+}
+async function setPoomsae(id) {
+  S.pid = id; localStorage.setItem('tkd:pid', id);
+  renderPoomsaeSelects(); $('result').innerHTML = '';
+  await refreshRefStatus();
+}
+async function getRef(id) {
+  if (!(id in S.refs)) {
+    try { S.refs[id] = (await S.store.read(`references/${id}.json`))?.data ?? null; }
+    catch (e) { toast(e.message); return null; }
+  }
+  return S.refs[id];
+}
+async function refreshRefStatus() {
+  $('refStatus').textContent = '기준 동작 확인 중…';
+  const ref = await getRef(S.pid);
+  $('refStatus').textContent = ref
+    ? `기준 동작 있음 (${new Date(ref.savedAt).toLocaleDateString('ko-KR')} 저장, ${ref.duration}초) — 사범님 동작과 비교해요.`
+    : '기준 동작이 아직 없어요. 어른이 "기준 동작 저장"으로 한 번 녹화하면 비교 점수가 생겨요.';
+}
+
+// ---------- 카메라 + 포즈 인식 ----------
+async function initLandmarker() {
+  if (S.lm) return;
+  $('msg').textContent = '동작 인식 준비 중… (처음 한 번은 조금 걸려요)';
+  const { FilesetResolver, PoseLandmarker } = await import(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MP_VER}`);
+  const fs = await FilesetResolver.forVisionTasks(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MP_VER}/wasm`);
+  const opts = (delegate) => ({ baseOptions: { modelAssetPath: MODEL_URL(S.cfg.capture.model || 'full'), delegate }, runningMode: 'VIDEO', numPoses: 1 });
+  try { S.lm = await PoseLandmarker.createFromOptions(fs, opts('GPU')); }
+  catch { S.lm = await PoseLandmarker.createFromOptions(fs, opts('CPU')); }
+}
+async function startCamera() {
+  stopCamera();
+  $('btnCam').disabled = true;
+  try {
+    await initLandmarker();
+    S.stream = await navigator.mediaDevices.getUserMedia({ audio: false,
+      video: { facingMode: S.facing, width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 60 } } });
+    const v = $('video'); v.srcObject = S.stream; await v.play();
+    $('canvas').width = v.videoWidth; $('canvas').height = v.videoHeight;
+    $('stage').classList.toggle('mirror', S.facing === 'user');
+    $('btnRec').disabled = false; $('btnCam').textContent = '카메라 끄기';
+    try { S.wake = await navigator.wakeLock?.request('screen'); } catch {}
+    loop();
+  } catch (e) {
+    $('msg').textContent = e.name === 'NotAllowedError' ? '카메라 권한을 허용해 주세요.' : `카메라를 켜지 못했어요: ${e.message}`;
+  } finally { $('btnCam').disabled = false; }
+}
+function stopCamera() {
+  cancelAnimationFrame(S.raf);
+  S.stream?.getTracks().forEach((t) => t.stop()); S.stream = null;
+  try { S.wake?.release(); } catch {} S.wake = null;
+  $('btnRec').disabled = true; $('btnCam').textContent = '카메라 켜기';
+  const c = $('canvas'); c.getContext('2d').clearRect(0, 0, c.width, c.height);
+}
+function loop() {
+  if (!S.stream) return;
+  const v = $('video'), now = performance.now();
+  if (v.readyState >= 2 && now > S.lastTs) {
+    S.lastTs = now;
+    const res = S.lm.detectForVideo(v, now);
+    onPose(res.landmarks?.[0], res.worldLandmarks?.[0], now);
+  }
+  S.raf = requestAnimationFrame(loop);
+}
+function onPose(img, world, now) {
+  const c = $('canvas'), g = c.getContext('2d');
+  g.clearRect(0, 0, c.width, c.height);
+  const minVis = S.cfg.capture.minVisibility;
+  if (img) {
+    g.lineWidth = Math.max(3, c.width / 200); g.strokeStyle = '#F2B705'; g.fillStyle = '#fff';
+    for (const [a, b] of LINKS) {
+      if ((img[a].visibility ?? 1) < minVis || (img[b].visibility ?? 1) < minVis) continue;
+      g.beginPath(); g.moveTo(img[a].x * c.width, img[a].y * c.height); g.lineTo(img[b].x * c.width, img[b].y * c.height); g.stroke();
+    }
+  }
+  const full = img && BODY.every((i) => (img[i].visibility ?? 1) >= minVis);
+  if (S.rec === 'idle') $('msg').textContent = full ? '좋아요! 시작을 누르세요.' : '머리부터 발끝까지 화면에 들어오게 서 주세요.';
+  if (S.rec === 'rec') {
+    $('msg').textContent = full ? '' : '몸이 화면 밖으로 나갔어요!';
+    if (now - S.lastSample >= 1000 / S.cfg.capture.sampleHz) {
+      S.lastSample = now;
+      const f = frameFeatures(img, world, Math.round(now - S.recT0), minVis);
+      f.p = img ? PTS.flatMap((i) => [+img[i].x.toFixed(3), +img[i].y.toFixed(3), +(img[i].visibility ?? 1).toFixed(2)]) : null;
+      S.frames.push(f);
+    }
+  }
+}
+
+// ---------- 녹화 ----------
+const replayOn = () => S.cfg.replay?.enabled !== false;
+async function startCountdown() {
+  if (S.rec !== 'idle') return;
+  if (replayOn()) { try { await S.vs.ensure(); } catch {} } // 폴더 권한은 버튼 누른 순간에만 요청 가능
+  S.rec = 'count'; $('result').innerHTML = '';
+  $('btnRec').textContent = '그만'; $('btnCam').disabled = true;
+  let n = S.cfg.capture.countdownSec;
+  $('count').textContent = n; $('msg').textContent = '준비!';
+  S.timer = setInterval(() => {
+    n--;
+    if (n > 0) { $('count').textContent = n; return; }
+    clearInterval(S.timer); $('count').textContent = '';
+    S.rec = 'rec'; S.frames = []; S.lastSample = 0; S.recT0 = performance.now();
+    startVideo();
+    $('stage').classList.add('recording');
+    S.timer = setTimeout(stopRecording, S.cfg.capture.maxSec * 1000);
+  }, 1000);
+}
+function startVideo() {
+  S.mr = null; S.chunks = [];
+  S.recType = replayOn() ? pickRecorderType() : null;
+  if (!S.recType) { if (replayOn()) toast('이 브라우저는 영상 녹화를 지원하지 않아 점수만 기록해요.'); return; }
+  try {
+    S.mr = new MediaRecorder(S.stream, { mimeType: S.recType.mime, videoBitsPerSecond: S.cfg.replay?.bitrate ?? 2000000 });
+    S.mr.ondataavailable = (e) => { if (e.data.size) S.chunks.push(e.data); };
+    // 실제 녹화 시작 시점으로 관절 시각을 다시 맞춤 (영상 0초 = 관절 0ms)
+    S.mr.onstart = () => { const d = Math.round(performance.now() - S.recT0); S.recT0 += d; S.frames.forEach((f) => (f.t -= d)); };
+    S.mr.start(1000);
+  } catch { S.mr = null; toast('영상 녹화를 시작하지 못해 점수만 기록해요.'); }
+}
+function stopVideo() {
+  const mr = S.mr; S.mr = null;
+  if (!mr || mr.state === 'inactive') return Promise.resolve(null);
+  return new Promise((res) => {
+    mr.onstop = () => res(S.chunks.length ? new Blob(S.chunks, { type: mr.mimeType || S.recType.mime }) : null);
+    mr.stop();
+  });
+}
+function stopRecording() {
+  clearInterval(S.timer); clearTimeout(S.timer);
+  const wasRec = S.rec === 'rec';
+  const blobP = stopVideo();
+  S.rec = 'idle'; $('count').textContent = '';
+  $('stage').classList.remove('recording');
+  $('btnRec').textContent = '시작'; $('btnCam').disabled = false;
+  if (wasRec) finish(S.frames.slice(), blobP);
+}
+
+async function finish(frames, blobP) {
+  const m = computeMetrics(frames);
+  if (m.error) { $('result').innerHTML = `<div class="result"><p class="result-title">${esc(m.error)}</p></div>`; return; }
+  const seq = frames.filter((f) => f.ok).map((f) => ({ t: f.t, a: f.a.map((x) => Math.round(x)) }));
+  if (S.mode === 'ref') {
+    await saveReference(seq, m);
+    return saveVideo('ref', Date.now().toString(36), frames, m, null, blobP);
+  }
+
+  const p = P(), mc = S.cfg.metrics;
+  const items = p.metrics.map((id) => {
+    const value = m.values[id], stars = starsFor(value, mc[id]);
+    return { id, value, stars, msg: stars ? mc[id].msg[stars] : '이번 기록에서는 측정되지 않았어요.' };
+  });
+  const ref = await getRef(S.pid);
+  let refRes = null;
+  if (ref?.seq?.length) {
+    refRes = compareToReference(seq, ref.seq);
+    if (refRes) {
+      const stars = starsFor(refRes.meanErr, mc.reference);
+      const msg = mc.reference.msg[stars].replace('{at}', Math.round(refRes.worstAtSec)).replace('{joint}', refRes.worstJointName);
+      items.push({ id: 'reference', value: refRes.meanErr, stars, msg, extra: refRes });
+    }
+  }
+  const scored = items.filter((i) => i.stars > 0);
+  const total = scored.reduce((s, i) => s + i.stars, 0), max = scored.length * 3;
+  const record = {
+    id: Date.now().toString(36), at: new Date().toISOString(), poomsaeId: S.pid, cfgVersion: S.cfg.version,
+    duration: m.duration, validRatio: +(m.validFrames / m.totalFrames).toFixed(2),
+    values: m.values, stars: Object.fromEntries(items.map((i) => [i.id, i.stars])),
+    ref: refRes ? { meanErr: refRes.meanErr, worstJoint: refRes.worstJointName, worstAtSec: refRes.worstAtSec, tempo: refRes.tempo } : null,
+    total, max,
+  };
+  renderResult(items, record, refRes);
+  try {
+    await S.store.update(`records/${S.child}.json`, (d) => { d.records.push(record); return d; }, { records: [] },
+      `기록: ${childName()} ${p.name} ${total}/${max}`);
+    $('saveState').textContent = `${S.store.label}에 저장했어요.`;
+  } catch (e) { $('saveState').textContent = `저장 실패: ${e.message}`; }
+  await saveVideo('practice', record.id, frames, m, { total, max }, blobP);
+}
+
+// 영상 + 관절 데이터를 이 기기에 저장 (기준 동작 영상은 ref/{품새}/ 아래)
+async function saveVideo(kind, id, frames, m, score, blobP) {
+  const el = () => $('vidState');
+  const blob = await blobP;
+  if (!blob) { if (el()) el().textContent = ''; return; }
+  const at = new Date(), ext = S.recType.ext;
+  const base = kind === 'ref' ? `ref/${S.pid}/${fileStamp(at)}_${id}` : `${S.child}/${S.pid}/${fileStamp(at)}_${id}`;
+  const meta = { v: 1, id, kind, at: at.toISOString(), child: kind === 'ref' ? null : S.child, childName: kind === 'ref' ? '사범님 기준' : childName(),
+    pid: S.pid, pname: P().name, ext, mime: blob.type, duration: m.duration, facing: S.facing, score, frames };
+  if (el()) el().textContent = '영상 저장 중…';
+  try {
+    await S.vs.save(base, ext, blob, meta);
+    if (el()) el().textContent = `영상 ${(blob.size / 1048576).toFixed(1)}MB를 ${S.vs.label}에 저장했어요. 기록 탭에서 다시 볼 수 있어요.`;
+  } catch (e) { if (el()) el().textContent = `영상 저장 실패: ${e.message}`; }
+}
+
+function stampSVG(pct) {
+  const st = S.cfg.stamp.find((s) => pct >= s.minPercent) || S.cfg.stamp.at(-1);
+  const t = st.text, sp = t.indexOf(' ');
+  const lines = t.length > 4 && sp > 0 ? [t.slice(0, sp), t.slice(sp + 1)] : [t];
+  const fs = Math.min(30, Math.floor(88 / Math.max(...lines.map((l) => l.length))));
+  const y0 = lines.length === 1 ? 78 : 54;
+  const txt = lines.map((l, i) => `<text x="70" y="${y0 + i * (fs + 4)}" text-anchor="middle" font-size="${fs}" fill="var(--red)">${esc(l)}</text>`).join('');
+  return `<svg class="stamp press" viewBox="0 0 140 140" role="img" aria-label="${esc(t)}">
+    <circle cx="70" cy="70" r="62" fill="none" stroke="var(--red)" stroke-width="6"/>
+    <circle cx="70" cy="70" r="52" fill="none" stroke="var(--red)" stroke-width="2"/>
+    ${txt}
+    <text x="70" y="${lines.length === 1 ? 104 : 110}" text-anchor="middle" font-size="15" fill="var(--red)">${pct}점</text></svg>`;
+}
+const starStr = (n) => `<span class="stars" aria-label="별 ${n}개">${'★'.repeat(n)}<span class="off">${'★'.repeat(3 - n)}</span></span>`;
+function fmt(v, unit) { return Number.isFinite(v) ? `${v}${unit}` : '측정 안 됨'; }
+
+function renderResult(items, rec, refRes) {
+  const mc = S.cfg.metrics, pct = rec.max ? Math.round((rec.total / rec.max) * 100) : 0;
+  let tempoMsg = '';
+  if (refRes && Number.isFinite(refRes.tempo)) {
+    if (refRes.tempo >= S.cfg.tempo.slowRatio) tempoMsg = S.cfg.tempo.slowMsg;
+    else if (refRes.tempo <= S.cfg.tempo.fastRatio) tempoMsg = S.cfg.tempo.fastMsg;
+  }
+  const li = items.map((i) => {
+    const d = mc[i.id], cmp = d.better === 'lower' ? '≤' : '≥';
+    let ev = `${d.what}: ${fmt(i.value, d.unit)} (별3 ${cmp}${d.stars3}${d.unit}, 별2 ${cmp}${d.stars2}${d.unit})`;
+    if (i.extra) ev += ` · 가장 다른 관절 ${i.extra.worstJointName} ${i.extra.jointErr[i.extra.worstJoint]}° · 빠르기 비 ${i.extra.tempo}`;
+    return `<li><div class="name"><span>${esc(d.label)}</span>${starStr(i.stars)}</div><p>${esc(i.msg)}</p><div class="evidence">${esc(ev)}</div></li>`;
+  }).join('');
+  $('result').innerHTML = `<div class="result">
+    <div class="result-top">${stampSVG(pct)}
+      <div><p class="result-title">${esc(childName())}, 별 ${rec.total}개!</p>
+      <p class="hint">${esc(P().name)} · ${rec.duration}초 · 몸이 보인 비율 ${Math.round(rec.validRatio * 100)}%</p></div></div>
+    ${tempoMsg ? `<p>${esc(tempoMsg)}</p>` : ''}
+    <ul class="items">${li}</ul>
+    <p class="hint" id="saveState">저장 중…</p><p class="hint" id="vidState"></p></div>`;
+  $('result').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+}
+
+async function saveReference(seq, m) {
+  const data = { poomsaeId: S.pid, savedAt: new Date().toISOString(), duration: m.duration, cfgVersion: S.cfg.version,
+                 angles: ANGLES.map((a) => a.name), seq };
+  $('result').innerHTML = `<div class="result"><p class="result-title">${esc(P().name)} 기준 동작 (${m.duration}초)</p><p class="hint" id="saveState">저장 중…</p><p class="hint" id="vidState"></p></div>`;
+  try {
+    await S.store.update(`references/${S.pid}.json`, () => data, {}, `기준 동작: ${P().name}`);
+    S.refs[S.pid] = data;
+    $('saveState').textContent = `${S.store.label}에 저장했어요. 이제 연습할 때 이 동작과 비교해요.`;
+    await refreshRefStatus();
+  } catch (e) { $('saveState').textContent = `저장 실패: ${e.message}`; }
+}
+
+// ---------- 기록 화면 ----------
+async function renderRecords() {
+  const pid = $('rSel').value;
+  renderReplayList();
+  $('recBody').innerHTML = '<p class="hint">불러오는 중…</p>';
+  let recs = [];
+  try { recs = ((await S.store.read(`records/${S.child}.json`))?.data.records || []).filter((r) => r.poomsaeId === pid); }
+  catch (e) { $('recBody').innerHTML = `<p class="hint">${esc(e.message)}</p>`; return; }
+  if (!recs.length) { $('recBody').innerHTML = `<p class="hint">${esc(childName())}의 이 품새 기록이 아직 없어요. 연습 탭에서 첫 기록을 남겨 보세요.</p>`; return; }
+  const last = recs.slice(-20), W = 640, H = 240, pad = 44;
+  const x = (i) => pad + (last.length === 1 ? (W - 2 * pad) / 2 : (i * (W - 2 * pad)) / (last.length - 1));
+  const y = (r) => H - pad - ((r.total / r.max) * (H - 2 * pad));
+  const pts = last.map((r, i) => `${x(i).toFixed(1)},${y(r).toFixed(1)}`).join(' ');
+  const grid = [0, 50, 100].map((v) => { const yy = H - pad - (v / 100) * (H - 2 * pad);
+    return `<line x1="${pad}" x2="${W - pad}" y1="${yy}" y2="${yy}" stroke="var(--line)"/><text x="4" y="${yy + 7}" font-size="20" fill="var(--sub)">${v}</text>`; }).join('');
+  const dots = last.map((r, i) => `<circle cx="${x(i)}" cy="${y(r)}" r="5" fill="var(--red)"/>`).join('');
+  const list = recs.slice().reverse().map((r) => {
+    const d = new Date(r.at);
+    return `<li><span>${starStr(Math.round((r.total / r.max) * 3))} ${r.total}/${r.max}</span><span class="d">${d.toLocaleDateString('ko-KR')} ${d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} · ${r.duration}초</span></li>`;
+  }).join('');
+  $('recBody').innerHTML = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="점수 변화 (최근 ${last.length}회)">${grid}
+    <polyline points="${pts}" fill="none" stroke="var(--blue)" stroke-width="3"/>${dots}</svg>
+    <p class="hint">점수 = 받은 별 ÷ 받을 수 있는 별 × 100, 최근 ${last.length}회</p><ul class="rec-list">${list}</ul>`;
+}
+
+// ---------- 다시 보기 ----------
+const R = { list: [], a: null, b: null, map: null, raf: 0, skel: true, mirror: true, rate: 1, pick: new Set() };
+const fmtT = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+const clipName = (it) => {
+  if (it.meta.kind === 'ref') return '사범님 기준';
+  const d = new Date(it.meta.at), p = (n) => String(n).padStart(2, '0');
+  return `${d.getMonth() + 1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+};
+const clipScore = (it) => it.meta.score ? `${Math.round((it.meta.score.total / it.meta.score.max) * 100)}점` : '';
+
+async function renderReplayList() {
+  const box = $('replayList'), pid = $('rSel').value;
+  if (S.vs.needsPermission) {
+    box.innerHTML = `<p class="hint">영상 폴더 "${esc(S.vs.folder.name)}"를 열려면 허용이 필요해요.</p><button class="btn go" id="btnPerm">영상 폴더 열기</button>`;
+    $('btnPerm').onclick = async () => { await S.vs.ensure(); renderReplayList(); };
+    return;
+  }
+  let mine = [], refs = [];
+  try { [mine, refs] = await Promise.all([S.vs.list(S.child, pid), S.vs.list('ref', pid)]); }
+  catch (e) { box.innerHTML = `<p class="hint">영상 목록을 읽지 못했어요: ${esc(e.message)}</p>`; return; }
+  mine = mine || []; refs = refs || [];
+  R.list = [...refs, ...mine];
+  R.pick.clear();
+  if (!R.list.length) { box.innerHTML = '<p class="hint">이 기기에 저장된 영상이 아직 없어요. 품새 탭에서 연습하면 영상이 함께 저장돼요.</p>'; return; }
+  const q = [];
+  if (mine.length >= 2) q.push(`<button class="btn" data-q="firstlast">처음 vs 최근</button>`);
+  if (mine.length && refs.length) q.push(`<button class="btn" data-q="ref">최근 vs 사범님</button>`);
+  q.push(`<button class="btn go" id="btnCmp" disabled>고른 2개 비교</button>`);
+  const rows = R.list.slice().reverse().map((it) => {
+    const i = R.list.indexOf(it);
+    return `<li><input type="checkbox" data-i="${i}" aria-label="${esc(clipName(it))} 비교에 고르기">
+      <div class="vt"><b>${esc(clipName(it))}</b><small>${it.meta.duration}초 ${clipScore(it) ? '· ' + clipScore(it) : ''}</small></div>
+      <button data-play="${i}">보기</button><button data-exp="${i}" aria-label="내보내기">내보내기</button><button data-del="${i}" aria-label="삭제">삭제</button></li>`;
+  }).join('');
+  box.innerHTML = `<div class="quick">${q.join('')}</div><ul class="vlist">${rows}</ul>`;
+  box.querySelector('[data-q="firstlast"]')?.addEventListener('click', () => openReplay(mine.at(-1), mine[0]));
+  box.querySelector('[data-q="ref"]')?.addEventListener('click', () => openReplay(mine.at(-1), refs.at(-1)));
+  box.querySelectorAll('input[type=checkbox]').forEach((c) => (c.onchange = () => {
+    c.checked ? R.pick.add(+c.dataset.i) : R.pick.delete(+c.dataset.i);
+    $('btnCmp').disabled = R.pick.size !== 2;
+  }));
+  $('btnCmp').onclick = () => { const [x, y] = [...R.pick].sort((p, q2) => q2 - p).map((i) => R.list[i]); openReplay(x, y); };
+  box.querySelectorAll('[data-play]').forEach((b) => (b.onclick = () => openReplay(R.list[+b.dataset.play])));
+  box.querySelectorAll('[data-exp]').forEach((b) => (b.onclick = () => exportClip(R.list[+b.dataset.exp])));
+  box.querySelectorAll('[data-del]').forEach((b) => (b.onclick = async () => {
+    const it = R.list[+b.dataset.del];
+    if (!confirm(`${clipName(it)} 영상을 지울까요? 점수 기록은 남아요.`)) return;
+    closeReplay(); await S.vs.remove(it.base, it.meta.ext); renderReplayList();
+  }));
+}
+
+async function exportClip(it) {
+  try {
+    const blob = await S.vs.video(it.base, it.meta.ext);
+    const who = it.meta.kind === 'ref' ? '사범님' : it.meta.childName;
+    const name = `${who}_${it.meta.pname}_${fileStamp(new Date(it.meta.at))}.${it.meta.ext}`.replace(/\s/g, '');
+    const file = new File([blob], name, { type: blob.type || it.meta.mime });
+    if (navigator.canShare?.({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: name }); return; } catch (e) { if (e.name === 'AbortError') return; }
+    }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+  } catch (e) { toast(`내보내기 실패: ${e.message}`); }
+}
+
+// MediaRecorder webm은 길이 정보가 없을 수 있어 끝으로 한번 이동해 길이를 알아낸다
+function readyVideo(v) {
+  return new Promise((res) => {
+    v.onloadedmetadata = () => {
+      if (Number.isFinite(v.duration)) return res();
+      v.ontimeupdate = () => { v.ontimeupdate = null; v.currentTime = 0; res(); };
+      v.currentTime = 1e101;
+    };
+    v.onerror = () => res();
+  });
+}
+
+async function loadClip(it, slot) {
+  const blob = await S.vs.video(it.base, it.meta.ext);
+  const v = slot.querySelector('video'), url = URL.createObjectURL(blob);
+  v.src = url; await readyVideo(v);
+  const c = slot.querySelector('canvas'); c.width = v.videoWidth || 720; c.height = v.videoHeight || 1280;
+  slot.querySelector('.pvbox').style.aspectRatio = `${c.width} / ${c.height}`;
+  return { it, v, c, url, frames: it.meta.frames || [] };
+}
+
+function closeReplay() {
+  cancelAnimationFrame(R.raf);
+  for (const k of ['a', 'b']) { if (R[k]) { R[k].v.pause(); URL.revokeObjectURL(R[k].url); R[k] = null; } }
+  R.map = null; $('player').innerHTML = '';
+}
+
+async function openReplay(itA, itB) {
+  closeReplay();
+  const two = !!itB;
+  R.mirror = itA.meta.facing === 'user';
+  const fig = (it, k) => `<figure class="pv" data-k="${k}"><div class="pvbox ${R.mirror ? 'mirror' : ''}"><video playsinline muted preload="auto"></video><canvas></canvas></div>
+    <figcaption>${esc(clipName(it))} ${clipScore(it) ? '· ' + clipScore(it) : ''}</figcaption></figure>`;
+  $('player').innerHTML = `<div class="player">
+    <div class="pv-row ${two ? 'two' : ''}">${fig(itA, 'a')}${two ? fig(itB, 'b') : ''}</div>
+    <input type="range" class="seek" id="pSeek" min="0" max="1000" value="0" aria-label="재생 위치">
+    <div class="ptime"><span id="pCur">0:00</span><span id="pDur"></span></div>
+    <div class="pctl">
+      <button id="pBack" aria-label="한 동작 뒤로">◀︎</button><button class="play" id="pPlay" aria-label="재생">▶︎</button><button id="pFwd" aria-label="한 동작 앞으로">▶︎▏</button>
+      <button data-rate="0.25" aria-pressed="false">¼배</button><button data-rate="0.5" aria-pressed="false">½배</button><button data-rate="1" aria-pressed="true">1배</button>
+      <button id="pSkel" aria-pressed="${R.skel}">뼈대</button><button id="pMir" aria-pressed="${R.mirror}">거울</button><button id="pClose">닫기</button>
+    </div>
+    <table class="pinfo" id="pInfo"></table>
+    ${two ? '<p class="hint">왼쪽 영상을 재생하면 오른쪽은 같은 동작 위치를 따라가요 (관절 각도 흐름으로 맞춤). 느리게 볼수록 정확해요.</p>' : ''}
+  </div>`;
+  try {
+    R.a = await loadClip(itA, $('player').querySelector('[data-k="a"]'));
+    if (two) {
+      R.b = await loadClip(itB, $('player').querySelector('[data-k="b"]'));
+      R.map = alignTimes(R.a.frames, R.b.frames);
+    }
+  } catch (e) { $('player').innerHTML = `<p class="hint">영상을 열지 못했어요: ${esc(e.message)}</p>`; return; }
+  const A = R.a.v;
+  $('pDur').textContent = fmtT(A.duration || itA.meta.duration);
+  A.playbackRate = R.rate;
+  $('pPlay').onclick = () => (A.paused ? A.play() : A.pause());
+  A.onplay = () => { $('pPlay').textContent = '❚❚'; $('pPlay').setAttribute('aria-label', '멈춤'); };
+  A.onpause = A.onended = () => { $('pPlay').textContent = '▶︎'; $('pPlay').setAttribute('aria-label', '재생'); };
+  const step = 1 / (S.cfg.capture.sampleHz || 15);
+  $('pBack').onclick = () => { A.pause(); A.currentTime = Math.max(0, A.currentTime - step); };
+  $('pFwd').onclick = () => { A.pause(); A.currentTime = Math.min(A.duration || 1e9, A.currentTime + step); };
+  $('pSeek').oninput = (e) => { A.currentTime = (e.target.value / 1000) * (A.duration || itA.meta.duration); };
+  $('player').querySelectorAll('[data-rate]').forEach((b) => (b.onclick = () => {
+    R.rate = +b.dataset.rate; A.playbackRate = R.rate;
+    $('player').querySelectorAll('[data-rate]').forEach((x) => x.setAttribute('aria-pressed', x === b));
+  }));
+  $('pSkel').onclick = () => { R.skel = !R.skel; $('pSkel').setAttribute('aria-pressed', R.skel); };
+  $('pMir').onclick = () => { R.mirror = !R.mirror; $('pMir').setAttribute('aria-pressed', R.mirror); $('player').querySelectorAll('.pvbox').forEach((x) => x.classList.toggle('mirror', R.mirror)); };
+  $('pClose').onclick = closeReplay;
+  $('player').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  R.raf = requestAnimationFrame(replayTick);
+}
+
+function drawClip(cl) {
+  const g = cl.c.getContext('2d'), W = cl.c.width, H = cl.c.height;
+  g.clearRect(0, 0, W, H);
+  const i = frameAt(cl.frames, cl.v.currentTime * 1000);
+  const f = i >= 0 ? cl.frames[i] : null;
+  if (R.skel && f?.p) {
+    const p = f.p, vis = S.cfg.capture.minVisibility;
+    g.lineWidth = Math.max(4, W / 160); g.strokeStyle = '#F2B705'; g.lineCap = 'round';
+    for (const [a, b] of PLINKS) {
+      if (p[a * 3 + 2] < vis || p[b * 3 + 2] < vis) continue;
+      g.beginPath(); g.moveTo(p[a * 3] * W, p[a * 3 + 1] * H); g.lineTo(p[b * 3] * W, p[b * 3 + 1] * H); g.stroke();
+    }
+  }
+  return f;
+}
+const kneeOf = (f) => f?.a ? Math.min(f.a[6], f.a[7]) : NaN;
+const elbowOf = (f) => f?.a ? Math.max(f.a[0], f.a[1]) : NaN;
+const deg = (x) => (Number.isFinite(x) ? `${Math.round(x)}°` : '—');
+
+function replayTick() {
+  if (!R.a) return;
+  const A = R.a.v;
+  if (R.b && R.map) {
+    const B = R.b.v, tb = Math.max(0, R.map(A.currentTime * 1000) / 1000);
+    if (!B.paused) B.pause();
+    if (!B.seeking && Math.abs(B.currentTime - tb) > 0.03) B.currentTime = Math.min(tb, (B.duration || 1e9) - 0.05);
+  }
+  const fa = drawClip(R.a), fb = R.b ? drawClip(R.b) : null;
+  const dur = A.duration || R.a.it.meta.duration;
+  if (document.activeElement !== $('pSeek')) $('pSeek').value = Math.round((A.currentTime / dur) * 1000) || 0;
+  $('pCur').textContent = fmtT(A.currentTime);
+  const rows = [['무릎 (더 굽힌 쪽)', kneeOf], ['팔꿈치 (더 편 쪽)', elbowOf], ['몸통 기울기', (f) => (f?.l ?? NaN)]];
+  const head = R.b ? '<tr><th></th><th>왼쪽</th><th>오른쪽</th><th>차이</th></tr>' : '';
+  $('pInfo').innerHTML = head + rows.map(([n, fn]) => {
+    const x = fn(fa), y = fb ? fn(fb) : NaN;
+    return `<tr><td>${n}</td><td>${deg(x)}</td>${R.b ? `<td>${deg(y)}</td><td>${Number.isFinite(x - y) ? (x - y > 0 ? '+' : '') + Math.round(x - y) + '°' : '—'}</td>` : ''}</tr>`;
+  }).join('');
+  R.raf = requestAnimationFrame(replayTick);
+}
+
+// 설정: 영상 저장 위치
+async function renderVideoSettings() {
+  const u = await S.vs.usage();
+  const used = u ? ` · 이 사이트 사용량 ${(u.used / 1048576).toFixed(0)}MB / 사용 가능 ${(u.quota / 1073741824).toFixed(1)}GB` : '';
+  const keep = S.vs.kind === 'app' ? (S.vs.persisted ? ' · 자동 삭제 방지 켜짐' : ' · 저장공간이 부족하면 브라우저가 지울 수 있어요') : '';
+  $('vState').textContent = `지금: ${S.vs.label}${S.vs.needsPermission ? ' (다시 허용 필요)' : ''}${used}${keep}`
+    + (canPickFolder ? '' : ' · 이 브라우저는 폴더 선택을 지원하지 않아 앱 저장공간을 써요.');
+  $('btnFolder').hidden = !canPickFolder;
+  $('btnAppStore').hidden = S.vs.kind === 'app';
+}
+
+// ---------- 오늘 운동 ----------
+const dayKey = (d) => d.toLocaleDateString('sv-SE'); // 기기 시간대 기준 YYYY-MM-DD
+const addDays = (key, n) => { const [y, m, d] = key.split('-').map(Number); return dayKey(new Date(y, m - 1, d + n)); };
+const today = () => dayKey(new Date());
+const D = { date: today(), month: today().slice(0, 7), data: { days: {} }, recs: [], dirty: new Set(), timer: 0 };
+const dItems = () => S.cfg.daily?.items ?? [];
+
+function itemDone(it, v) { return it.type === 'check' ? v === true : Number(v) >= (it.goal ?? 1); }
+function recsOn(key) { return D.recs.filter((r) => dayKey(new Date(r.at)) === key); }
+// 날짜 상태: full = 필수 항목 목표 모두 달성, part = 하나라도 운동(품새 연습 포함), none
+function dayState(key) {
+  const v = D.data.days[key]?.v ?? {};
+  const req = dItems().filter((i) => !i.optional);
+  if (req.length && req.every((i) => itemDone(i, v[i.id]))) return 'full';
+  const any = dItems().some((i) => (i.type === 'check' ? v[i.id] === true : Number(v[i.id]) > 0));
+  return any || recsOn(key).length ? 'part' : 'none';
+}
+function streak() {
+  let k = today(), n = 0;
+  if (dayState(k) === 'none') k = addDays(k, -1); // 오늘 아직 안 했으면 어제부터 셈
+  while (dayState(k) !== 'none' && n < 3660) { n++; k = addDays(k, -1); }
+  return n;
+}
+
+async function loadDaily() {
+  $('dSave').textContent = '불러오는 중…';
+  try {
+    const [d, r] = await Promise.all([S.store.read(`daily/${S.child}.json`), S.store.read(`records/${S.child}.json`)]);
+    D.data = d?.data ?? { days: {} }; D.recs = r?.data.records ?? [];
+    $('dSave').textContent = '';
+  } catch (e) { D.data = { days: {} }; D.recs = []; $('dSave').textContent = e.message; }
+  renderDaily();
+}
+function setVal(id, val) {
+  const wasFull = dayState(D.date) === 'full';
+  const e = (D.data.days[D.date] ??= { v: {} });
+  e.v[id] = val; e.at = new Date().toISOString();
+  markDirty();
+  renderDaily();
+  if (!wasFull && dayState(D.date) === 'full') toast(`${childName()}, 오늘 목표를 모두 채웠어요!`);
+}
+function markDirty() {
+  D.dirty.add(D.date); $('dSave').textContent = '저장 대기…';
+  clearTimeout(D.timer); D.timer = setTimeout(flushDaily, 1200);
+}
+// 바뀐 날짜만 덮어써서, 다른 기기가 기록한 다른 날짜는 건드리지 않음
+async function flushDaily() {
+  clearTimeout(D.timer);
+  if (!D.dirty.size) return;
+  const dates = [...D.dirty]; D.dirty.clear();
+  const patch = Object.fromEntries(dates.map((k) => [k, D.data.days[k]]));
+  try {
+    await S.store.update(`daily/${S.child}.json`, (d) => { Object.assign(d.days, patch); return d; }, { days: {} },
+      `운동: ${childName()} ${dates.join(',')}`);
+    $('dSave').textContent = `${S.store.label}에 저장했어요.`;
+  } catch (e) { dates.forEach((k) => D.dirty.add(k)); $('dSave').textContent = `저장 실패: ${e.message}`; }
+}
+
+function renderDaily() {
+  const key = D.date, isToday = key === today();
+  const dt = new Date(key + 'T00:00:00');
+  $('dDate').textContent = `${dt.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' })}${isToday ? ' · 오늘' : ''}`;
+  $('dNext').disabled = key >= today();
+  const v = D.data.days[key]?.v ?? {};
+  const req = dItems().filter((i) => !i.optional), done = req.filter((i) => itemDone(i, v[i.id])).length;
+  $('dStreak').textContent = streak();
+  $('dProg').textContent = req.length ? `목표 ${done}/${req.length}` : '';
+  $('dBar').style.width = req.length ? `${(done / req.length) * 100}%` : '0';
+
+  $('dItems').innerHTML = dItems().map((it) => {
+    const val = v[it.id], ok = itemDone(it, val);
+    const sub = it.type === 'check' ? (it.optional ? '하면 좋아요' : '오늘 하기') : `목표 ${it.goal}${it.unit ?? ''}${it.optional ? ' · 하면 좋아요' : ''}`;
+    const ctl = it.type === 'check'
+      ? `<button class="chk" data-id="${esc(it.id)}" aria-pressed="${val === true}" aria-label="${esc(it.name)} 했어요">✓</button>`
+      : `<div class="cnt"><button data-id="${esc(it.id)}" data-d="-1" aria-label="${esc(it.name)} 줄이기">−</button>
+         <input type="number" inputmode="numeric" min="0" data-id="${esc(it.id)}" value="${Number(val) || 0}" aria-label="${esc(it.name)} ${esc(it.unit ?? '')}">
+         <button data-id="${esc(it.id)}" data-d="1" aria-label="${esc(it.name)} 늘리기">+</button></div>`;
+    return `<li class="${ok ? 'done' : ''}"><div class="nm"><b>${esc(it.name)}</b><small>${esc(sub)}</small></div>${ctl}</li>`;
+  }).join('');
+  $('dItems').querySelectorAll('.chk').forEach((b) => (b.onclick = () => setVal(b.dataset.id, b.getAttribute('aria-pressed') !== 'true')));
+  $('dItems').querySelectorAll('.cnt button').forEach((b) => (b.onclick = () => {
+    const it = dItems().find((i) => i.id === b.dataset.id), cur = Number(v[it.id]) || 0;
+    setVal(it.id, Math.max(0, cur + Number(b.dataset.d) * (it.step ?? 1)));
+  }));
+  $('dItems').querySelectorAll('.cnt input').forEach((inp) => (inp.onchange = () => setVal(inp.dataset.id, Math.max(0, Math.round(Number(inp.value) || 0)))));
+
+  const rs = recsOn(key);
+  $('dPoomsae').textContent = rs.length
+    ? `품새 연습 ${rs.length}번 · 가장 잘한 점수 ${Math.max(...rs.map((r) => Math.round((r.total / r.max) * 100)))}점 (품새 탭 기록이 자동으로 들어와요)`
+    : '이날 품새 연습 기록은 없어요.';
+  if (document.activeElement !== $('dNote')) $('dNote').value = D.data.days[key]?.note ?? '';
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const [y, m] = D.month.split('-').map(Number);
+  $('calTitle').textContent = `${y}년 ${m}월`;
+  $('cNext').disabled = D.month >= today().slice(0, 7);
+  const first = new Date(y, m - 1, 1).getDay(), days = new Date(y, m, 0).getDate(), t = today();
+  let html = ['일', '월', '화', '수', '목', '금', '토'].map((w) => `<div class="h">${w}</div>`).join('');
+  html += '<div class="blank"></div>'.repeat(first);
+  let full = 0;
+  for (let d = 1; d <= days; d++) {
+    const k = `${D.month}-${String(d).padStart(2, '0')}`, st = k > t ? 'future' : dayState(k);
+    if (st === 'full') full++;
+    html += `<button data-k="${k}" class="${st} ${k === D.date ? 'sel' : ''}" ${k > t ? 'disabled' : ''} aria-label="${m}월 ${d}일 ${st === 'full' ? '목표 달성' : st === 'part' ? '운동함' : ''}">${d}</button>`;
+  }
+  $('cal').innerHTML = html;
+  $('calTitle').textContent += ` · 목표 달성 ${full}일`;
+  $('cal').querySelectorAll('button[data-k]').forEach((b) => (b.onclick = () => { D.date = b.dataset.k; renderDaily(); }));
+}
+function shiftMonth(n) { const [y, m] = D.month.split('-').map(Number); D.month = dayKey(new Date(y, m - 1 + n, 1)).slice(0, 7); renderCalendar(); }
+
+// ---------- 화면 전환 / 이벤트 ----------
+function show(v) {
+  document.querySelectorAll('nav.tabs button').forEach((b) => b.setAttribute('aria-selected', b.dataset.v === v));
+  ['daily', 'practice', 'records', 'settings'].forEach((k) => ($(`v-${k}`).hidden = k !== v));
+  if (v !== 'daily') flushDaily();
+  if (v === 'daily') loadDaily();
+  if (v !== 'practice') { if (S.rec !== 'idle') stopRecording(); stopCamera(); }
+  if (v === 'records') { $('rSel').value = S.pid; renderRecords(); }
+  if (v !== 'records') closeReplay();
+  if (v === 'settings') { fillSettings(); renderVideoSettings(); }
+}
+function fillSettings() {
+  const s = loadSettings();
+  $('sOwner').value = s.owner || ''; $('sRepo').value = s.repo || ''; $('sBranch').value = s.branch || ''; $('sToken').value = s.token || '';
+  $('sState').textContent = `지금 저장 위치: ${S.store.label}`;
+  $('appInfo').textContent = `설정 파일 버전 ${S.cfg.version} · 동작 인식 MediaPipe Pose Landmarker ${MP_VER} (${S.cfg.capture.model}) · 초당 ${S.cfg.capture.sampleHz}회 기록`;
+}
+function setMode(m) {
+  S.mode = m;
+  $('mPractice').setAttribute('aria-pressed', m === 'practice'); $('mRef').setAttribute('aria-pressed', m === 'ref');
+  $('result').innerHTML = '';
+}
+
+document.querySelectorAll('nav.tabs button').forEach((b) => (b.onclick = () => show(b.dataset.v)));
+$('dPrev').onclick = () => { D.date = addDays(D.date, -1); D.month = D.date.slice(0, 7); renderDaily(); };
+$('dNext').onclick = () => { if (D.date < today()) { D.date = addDays(D.date, 1); D.month = D.date.slice(0, 7); renderDaily(); } };
+$('cPrev').onclick = () => shiftMonth(-1);
+$('cNext').onclick = () => shiftMonth(1);
+$('dNote').oninput = () => { const e = (D.data.days[D.date] ??= { v: {} }); e.note = $('dNote').value; e.at = new Date().toISOString(); markDirty(); };
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushDaily(); });
+$('pSel').onchange = (e) => setPoomsae(e.target.value);
+$('rSel').onchange = () => { closeReplay(); renderRecords(); };
+$('btnFolder').onclick = async () => {
+  try { await S.vs.pickFolder(); toast(`앞으로 영상은 "${S.vs.folder.name}" 폴더에 저장돼요.`); }
+  catch (e) { if (e.name !== 'AbortError') toast(`폴더를 쓸 수 없어요: ${e.message}`); }
+  renderVideoSettings();
+};
+$('btnAppStore').onclick = async () => { await S.vs.useApp(); toast('앞으로 영상은 앱 저장공간에 저장돼요. 폴더에 있던 영상은 그대로 남아 있어요.'); renderVideoSettings(); };
+$('mPractice').onclick = () => setMode('practice');
+$('mRef').onclick = () => setMode('ref');
+$('btnCam').onclick = () => (S.stream ? stopCamera() : startCamera());
+$('btnRec').onclick = () => (S.rec === 'idle' ? startCountdown() : stopRecording());
+$('btnFlip').onclick = () => { S.facing = S.facing === 'user' ? 'environment' : 'user'; if (S.stream) startCamera(); };
+$('btnSave').onclick = async () => {
+  const s = { owner: $('sOwner').value.trim(), repo: $('sRepo').value.trim(), branch: $('sBranch').value.trim(), token: $('sToken').value.trim() };
+  saveSettings(s); S.store = new Store(s); S.refs = {};
+  $('sState').textContent = '확인 중…';
+  try { $('sState').textContent = await S.store.test(); } catch (e) { $('sState').textContent = e.message; }
+  refreshRefStatus();
+  if (!$('v-daily').hidden) loadDaily();
+};
+
+(async () => {
+  try { await loadConfig(); } catch (e) { $('msg').textContent = e.message; return; }
+  try { await S.vs.init(); } catch {}
+  const savedChild = localStorage.getItem('tkd:child'), savedP = localStorage.getItem('tkd:pid');
+  S.child = S.cfg.children.some((c) => c.id === savedChild) ? savedChild : S.cfg.children[0].id;
+  S.pid = S.cfg.poomsae.some((p) => p.id === savedP) ? savedP : S.cfg.poomsae[0].id;
+  renderKids(); renderPoomsaeSelects(); refreshRefStatus(); loadDaily();
+})();
+</script>
+</body>
+</html>
