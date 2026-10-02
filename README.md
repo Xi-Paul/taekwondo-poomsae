@@ -10,7 +10,8 @@
 | `config/poomsae.json` | 아이 이름, 품새 목록, 별점 기준값, 조언 문구 | 자주 (업데이트 지점) |
 | `js/metrics.js` | 지표 계산 (관절각, DTW 비교) | 계산 방식을 바꿀 때만 |
 | `js/store.js` | GitHub 저장/불러오기 | 거의 없음 |
-| `js/videostore.js` | 리플레이 영상 저장 (기기 안) | 거의 없음 |
+| `js/videostore.js` | 리플레이 영상 저장 (기기 안 / APK 네이티브) | 거의 없음 |
+| `android/` | APK 껍데기 (WebView + 영상 저장 브리지) | 저장 기능을 바꿀 때만 |
 | `index.html` | 화면 | 화면을 바꿀 때만 |
 
 데이터 저장소(따로 만듦)에는 앱이 다음 파일을 자동으로 만듭니다.
@@ -74,6 +75,30 @@
 - **처음 vs 최근**, **최근 vs 사범님**, 또는 목록에서 두 개를 골라 나란히 비교. 두 영상은 관절각 흐름을 DTW로 맞춰서, 왼쪽을 재생하면 오른쪽이 같은 동작 위치로 따라간다. 빠르기가 달라도 같은 동작끼리 보이며 각도 차이도 함께 나온다
 
 **한계**: 뼈대는 sampleHz(기본 15회/초)로 기록되어 영상보다 덜 매끄럽다 (`capture.sampleHz`를 30으로 올리면 부드러워지지만 기기 부하 증가). 같은 자세가 오래 이어지는 구간은 비교 위치가 조금 어긋날 수 있다.
+
+## Android APK
+
+`android/`는 GitHub Pages의 웹앱을 그대로 띄우는 WebView 앱이다. 화면·지표·설정은 모두 웹앱 쪽이라 **zip 업로드만으로 갱신되고 APK를 다시 설치할 필요가 없다.** APK는 웹앱이 못 하는 것만 맡는다.
+
+| 기능 | 위치 |
+|---|---|
+| 영상 저장 | `Movies/품새연습장/{아이id}/{품새id}/…mp4` — 갤러리·파일 관리자에 보임 |
+| 관절 데이터 | `Documents/품새연습장/{아이id}/{품새id}/…pose.json` |
+| 공유 | 안드로이드 공유 창 (카톡, 드라이브 등) |
+| 화면 꺼짐 방지 | 카메라 켜진 동안 |
+
+- Android 10 이상 (minSdk 29). MediaStore를 쓰므로 저장소 권한 없이 카메라 권한만 요청한다.
+- 웹앱은 `window.TkdNative`가 있으면 APK 저장을 쓰고, 없으면(iPhone·PC 브라우저) 기존 방식으로 동작한다.
+- 아이 id(`children[].id`)는 영문·숫자·`_`·`-`만 쓸 것 — 폴더 이름이 된다.
+
+**빌드**: 같은 워크플로가 zip을 푼 뒤 `android/`가 바뀌었으면 APK를 빌드해 Release(`apk-1.0.N`)에 첨부한다. 웹 파일만 바뀌면 빌드하지 않는다. Actions 탭 → "압축 풀고 배포" → Run workflow로 수동 빌드도 가능.
+
+**서명 키**: `ANDROID_KEYSTORE_B64`, `ANDROID_KEYSTORE_PASSWORD` 두 Secret이 있어야 매 빌드가 같은 키로 서명되어 **덮어 설치**가 된다. 키를 잃어버리면 앱을 지우고 새로 설치해야 하고, 그러면 이전에 저장한 영상이 앱 목록에서 사라진다 (갤러리에는 남음). 키를 직접 만들려면:
+
+```
+keytool -genkeypair -keystore release.jks -storetype PKCS12 -alias poomsae -keyalg RSA -keysize 2048 -validity 10000
+base64 -w0 release.jks   # 출력 전체를 ANDROID_KEYSTORE_B64에
+```
 
 ## 지표 정의 (판정 근거)
 

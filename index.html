@@ -343,6 +343,7 @@ async function startCamera() {
     $('stage').classList.toggle('mirror', S.facing === 'user');
     $('btnRec').disabled = false; $('btnCam').textContent = '카메라 끄기';
     try { S.wake = await navigator.wakeLock?.request('screen'); } catch {}
+    try { window.TkdNative?.keepScreenOn(true); } catch {}
     loop();
   } catch (e) {
     $('msg').textContent = e.name === 'NotAllowedError' ? '카메라 권한을 허용해 주세요.' : `카메라를 켜지 못했어요: ${e.message}`;
@@ -352,6 +353,7 @@ function stopCamera() {
   cancelAnimationFrame(S.raf);
   S.stream?.getTracks().forEach((t) => t.stop()); S.stream = null;
   try { S.wake?.release(); } catch {} S.wake = null;
+  try { window.TkdNative?.keepScreenOn(false); } catch {}
   $('btnRec').disabled = true; $('btnCam').textContent = '카메라 켜기';
   const c = $('canvas'); c.getContext('2d').clearRect(0, 0, c.width, c.height);
 }
@@ -625,9 +627,10 @@ async function renderReplayList() {
 
 async function exportClip(it) {
   try {
-    const blob = await S.vs.video(it.base, it.meta.ext);
+    const blob = S.vs.kind === 'native' ? null : await S.vs.video(it.base, it.meta.ext);
     const who = it.meta.kind === 'ref' ? '사범님' : it.meta.childName;
     const name = `${who}_${it.meta.pname}_${fileStamp(new Date(it.meta.at))}.${it.meta.ext}`.replace(/\s/g, '');
+    if (S.vs.kind === 'native') { S.vs.shareNative(it.base, it.meta.ext, name); return; }
     const file = new File([blob], name, { type: blob.type || it.meta.mime });
     if (navigator.canShare?.({ files: [file] })) {
       try { await navigator.share({ files: [file], title: name }); return; } catch (e) { if (e.name === 'AbortError') return; }
@@ -670,6 +673,8 @@ async function openReplay(itA, itB) {
   R.mirror = itA.meta.facing === 'user';
   const fig = (it, k) => `<figure class="pv" data-k="${k}"><div class="pvbox ${R.mirror ? 'mirror' : ''}"><video playsinline muted preload="auto"></video><canvas></canvas></div>
     <figcaption>${esc(clipName(it))} ${clipScore(it) ? '· ' + clipScore(it) : ''}</figcaption></figure>`;
+  $('player').innerHTML = '<p class="hint">영상 여는 중…</p>';
+  await new Promise((r) => setTimeout(r, 0));
   $('player').innerHTML = `<div class="player">
     <div class="pv-row ${two ? 'two' : ''}">${fig(itA, 'a')}${two ? fig(itB, 'b') : ''}</div>
     <input type="range" class="seek" id="pSeek" min="0" max="1000" value="0" aria-label="재생 위치">
@@ -752,6 +757,11 @@ function replayTick() {
 
 // 설정: 영상 저장 위치
 async function renderVideoSettings() {
+  if (S.vs.kind === 'native') {
+    $('vState').textContent = `지금: ${S.vs.label} · 영상은 갤러리, 관절 데이터는 Documents/품새연습장에 있어요. 앱을 지우지 말고 새 APK로 덮어 설치해야 영상 목록이 유지돼요.`;
+    $('btnFolder').hidden = true; $('btnAppStore').hidden = true;
+    return;
+  }
   const u = await S.vs.usage();
   const used = u ? ` · 이 사이트 사용량 ${(u.used / 1048576).toFixed(0)}MB / 사용 가능 ${(u.quota / 1073741824).toFixed(1)}GB` : '';
   const keep = S.vs.kind === 'app' ? (S.vs.persisted ? ' · 자동 삭제 방지 켜짐' : ' · 저장공간이 부족하면 브라우저가 지울 수 있어요') : '';
@@ -889,7 +899,9 @@ function fillSettings() {
   const s = loadSettings();
   $('sOwner').value = s.owner || ''; $('sRepo').value = s.repo || ''; $('sBranch').value = s.branch || ''; $('sToken').value = s.token || '';
   $('sState').textContent = `지금 저장 위치: ${S.store.label}`;
-  $('appInfo').textContent = `설정 파일 버전 ${S.cfg.version} · 동작 인식 MediaPipe Pose Landmarker ${MP_VER} (${S.cfg.capture.model}) · 초당 ${S.cfg.capture.sampleHz}회 기록`;
+  let apk = '';
+  try { if (window.TkdNative) apk = `APK ${window.TkdNative.version()} · `; } catch {}
+  $('appInfo').textContent = `${apk}설정 파일 버전 ${S.cfg.version} · 동작 인식 MediaPipe Pose Landmarker ${MP_VER} (${S.cfg.capture.model}) · 초당 ${S.cfg.capture.sampleHz}회 기록`;
 }
 function setMode(m) {
   S.mode = m;

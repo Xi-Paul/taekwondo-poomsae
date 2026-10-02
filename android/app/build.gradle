@@ -1,0 +1,50 @@
+plugins {
+    id 'com.android.application'
+}
+
+// GitHub Actions에서 주입: 실행 번호 → 버전, 서명 키 경로/비밀번호
+def runNo = (System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger()
+def ksPath = System.getenv('TKD_KEYSTORE')
+def ksPass = System.getenv('TKD_KEYSTORE_PASSWORD')
+
+android {
+    namespace = 'io.github.xipaul.poomsae'
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = 'io.github.xipaul.poomsae'
+        minSdk = 29          // Android 10+: MediaStore RELATIVE_PATH(지정 폴더 저장) 사용
+        targetSdk = 35
+        versionCode = runNo
+        versionName = "1.0.${runNo}"
+        buildConfigField 'String', 'APP_URL', '"https://xi-paul.github.io/taekwondo-poomsae/"'
+        buildConfigField 'String', 'APP_HOST', '"xi-paul.github.io"'
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    signingConfigs {
+        release {
+            if (ksPath) {
+                storeFile = file(ksPath)
+                storePassword = ksPass
+                keyAlias = 'poomsae'
+                keyPassword = ksPass
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled = false
+            signingConfig = ksPath ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}

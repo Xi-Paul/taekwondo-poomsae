@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 노란 띠 매듭 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#F2B705" android:pathData="M22,44h64v13h-64z" />
+    <path android:fillColor="#F2B705" android:pathData="M50,57l-11,22h9l8,-17z" />
+    <path android:fillColor="#F2B705" android:pathData="M58,57l11,22h-9l-8,-17z" />
+    <path android:fillColor="#C99500" android:pathData="M46,40h16v21h-16z" />
+    <path android:fillColor="#C8102E" android:pathData="M22,44h6v13h-6zM80,44h6v13h-6z" />
+</vector>
