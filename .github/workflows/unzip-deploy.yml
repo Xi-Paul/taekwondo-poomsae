@@ -1,16 +1,22 @@
-# 업로드한 zip을 자동으로 풀어 저장소에 반영하고 GitHub Pages로 배포
-# 위치: .github/workflows/unzip-deploy.yml
+# 업로드한 zip을 풀어 저장소에 반영 → GitHub Pages 배포 → android/가 바뀌었으면 APK 빌드·Release 첨부
+# 위치: .github/workflows/unzip-deploy.yml   (기존 파일을 이 내용으로 교체)
 # 필요 설정: Settings → Pages → Source: GitHub Actions
+# APK 서명 비밀값(권장): ANDROID_KEYSTORE_B64, ANDROID_KEYSTORE_PASSWORD
 name: 압축 풀고 배포
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      build_apk:
+        description: 'APK도 빌드'
+        type: boolean
+        default: true
 
 permissions:
-  contents: write   # 푼 파일을 커밋
-  pages: write      # Pages 배포
+  contents: write
+  pages: write
   id-token: write
 
 concurrency:
@@ -23,8 +29,12 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      android: ${{ steps.changed.outputs.android }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: 업로드한 zip 풀기
         run: |
@@ -37,11 +47,8 @@ jobs:
             rm -rf "$tmp/__MACOSX"
             src="$tmp"
             entries=("$tmp"/*)
-            # zip 안에 최상위 폴더 하나만 있으면 그 폴더 내용을 꺼냄
             if [ ${#entries[@]} -eq 1 ] && [ -d "${entries[0]}" ]; then src="${entries[0]}"; fi
-            # 워크플로 파일은 GITHUB_TOKEN으로 수정할 수 없으므로 제외
             rm -rf "$src/.github"
-            # 웹에서 고친 설정 보존: 내용이 다르면 zip의 설정은 poomsae.zip.json으로 따로 둠
             if [ -f config/poomsae.json ] && [ -f "$src/config/poomsae.json" ] && ! cmp -s config/poomsae.json "$src/config/poomsae.json"; then
               mv "$src/config/poomsae.json" "$src/config/poomsae.zip.json"
               echo "::warning::config/poomsae.json은 기존 것을 유지했습니다. zip의 설정은 config/poomsae.zip.json 에 있습니다."
@@ -55,9 +62,71 @@ jobs:
           git add -A
           git commit -m "zip 풀기: ${zips[*]}" && git push || echo "변경 없음"
 
+      # 봇 커밋은 새 워크플로를 깨우지 않으므로, APK 빌드 여부를 여기서 판단해 다음 작업으로 넘긴다
+      - name: android 변경 확인
+        id: changed
+        env:
+          BEFORE: ${{ github.event.before }}
+          EVENT: ${{ github.event_name }}
+          FORCE: ${{ inputs.build_apk }}
+        run: |
+          if [ ! -d android ]; then echo "android=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if [ "$EVENT" = "workflow_dispatch" ]; then echo "android=${FORCE:-true}" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            echo "android=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if git diff --quiet "$BEFORE" HEAD -- android; then echo "android=false" >> "$GITHUB_OUTPUT"; else echo "android=true" >> "$GITHUB_OUTPUT"; fi
+
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
           path: .
       - id: deployment
         uses: actions/deploy-pages@v5
+
+  apk:
+    needs: deploy
+    if: needs.deploy.outputs.android == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main   # 압축 풀기 커밋까지 포함된 최신 상태
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: '8.14.3'
+
+      - name: 서명 키 준비
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "TKD_KEYSTORE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+          else
+            echo "::warning::ANDROID_KEYSTORE_B64 비밀값이 없어 임시 키로 서명합니다. 빌드마다 서명이 달라 덮어 설치가 안 됩니다."
+          fi
+
+      - name: APK 빌드
+        env:
+          TKD_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: gradle -p android assembleRelease --no-daemon --stacktrace
+
+      - name: Release에 첨부
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ver="1.0.${GITHUB_RUN_NUMBER}"
+          apk="poomsae-${ver}.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "$apk"
+          gh release create "apk-${ver}" "$apk" --target main \
+            --title "품새 연습장 APK ${ver}" \
+            --notes "휴대폰에서 이 APK를 받아 설치하세요. 이전 버전 위에 덮어 설치하면 영상 목록이 유지됩니다."
