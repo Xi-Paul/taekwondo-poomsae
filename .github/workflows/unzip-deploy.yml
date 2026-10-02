@@ -1,0 +1,63 @@
+# 업로드한 zip을 자동으로 풀어 저장소에 반영하고 GitHub Pages로 배포
+# 위치: .github/workflows/unzip-deploy.yml
+# 필요 설정: Settings → Pages → Source: GitHub Actions
+name: 압축 풀고 배포
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # 푼 파일을 커밋
+  pages: write      # Pages 배포
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: 업로드한 zip 풀기
+        run: |
+          shopt -s nullglob
+          zips=(*.zip)
+          if [ ${#zips[@]} -eq 0 ]; then echo "zip 없음 — 압축 풀기 건너뜀"; exit 0; fi
+          for z in "${zips[@]}"; do
+            tmp=$(mktemp -d)
+            unzip -o -q "$z" -d "$tmp"
+            rm -rf "$tmp/__MACOSX"
+            src="$tmp"
+            entries=("$tmp"/*)
+            # zip 안에 최상위 폴더 하나만 있으면 그 폴더 내용을 꺼냄
+            if [ ${#entries[@]} -eq 1 ] && [ -d "${entries[0]}" ]; then src="${entries[0]}"; fi
+            # 워크플로 파일은 GITHUB_TOKEN으로 수정할 수 없으므로 제외
+            rm -rf "$src/.github"
+            # 웹에서 고친 설정 보존: 내용이 다르면 zip의 설정은 poomsae.zip.json으로 따로 둠
+            if [ -f config/poomsae.json ] && [ -f "$src/config/poomsae.json" ] && ! cmp -s config/poomsae.json "$src/config/poomsae.json"; then
+              mv "$src/config/poomsae.json" "$src/config/poomsae.zip.json"
+              echo "::warning::config/poomsae.json은 기존 것을 유지했습니다. zip의 설정은 config/poomsae.zip.json 에 있습니다."
+            fi
+            cp -a "$src"/. .
+            rm -f "$z"
+            echo "풀기 완료: $z"
+          done
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "zip 풀기: ${zips[*]}" && git push || echo "변경 없음"
+
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v5
