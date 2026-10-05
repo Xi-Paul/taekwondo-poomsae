@@ -39,7 +39,7 @@ export function pickRecorderType() {
 
 // APK 브리지(동기 호출)와 주고받는 조각 크기
 const CHUNK = 768 * 1024;
-const MIME = { mp4: 'video/mp4', webm: 'video/webm' };
+const MIME = { mp4: 'video/mp4', webm: 'video/webm', mov: 'video/quicktime', m4v: 'video/x-m4v', '3gp': 'video/3gpp', mkv: 'video/x-matroska' };
 function blobToB64(blob) {
   return new Promise((res, rej) => {
     const r = new FileReader();

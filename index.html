@@ -44,6 +44,14 @@ select{font-family:var(--display);font-size:1.15rem;flex:1;min-width:0}
 .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface);margin-top:10px}
 .seg button{border:0;background:none;padding:9px 14px;cursor:pointer;min-height:44px}
 .seg button[aria-pressed="true"]{background:var(--blue);color:#fff}
+.mlist{list-style:none;padding:0;margin:6px 0}
+.mlist li{display:flex;align-items:center;gap:8px;padding:8px 2px;border-bottom:1px solid var(--line)}
+.mlist li span{flex:1;min-width:0}
+.mlist button{min-height:40px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--red);cursor:pointer;padding:0 10px}
+.mcmp{width:100%;border-collapse:collapse;font-size:.92rem;margin-top:8px}
+.mcmp th,.mcmp td{padding:7px 4px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.mcmp td.n{text-align:right;white-space:nowrap}
+.mcmp td:first-child{white-space:nowrap}
 
 .stage{position:relative;margin-top:12px;background:#0d1020;border-radius:14px;overflow:hidden;aspect-ratio:3/4;max-height:56vh;width:100%}
 @media (min-width:600px){.stage{aspect-ratio:4/3}}
@@ -54,12 +62,33 @@ select{font-family:var(--display);font-size:1.15rem;flex:1;min-width:0}
 .stage .count{position:absolute;inset:0;display:grid;place-items:center;font:400 9rem/1 var(--display);color:#fff;text-shadow:0 4px 24px rgba(0,0,0,.5);pointer-events:none}
 .stage .rec{position:absolute;top:12px;left:12px;background:var(--red);color:#fff;border-radius:999px;padding:3px 12px;font-weight:700;font-size:.9rem;display:none}
 .stage.recording .rec{display:block}
+.camctl,.stage .turn{display:none}
+body.shoot{overflow:hidden}
+body.shoot .stage{position:fixed;inset:0;z-index:30;margin:0;border-radius:0;max-height:none;aspect-ratio:auto;width:auto;background:#000}
+body.shoot .camctl{display:flex;position:absolute;z-index:2;left:0;right:0;bottom:16px;gap:22px;align-items:center;justify-content:center}
+body.shoot .stage .msg{bottom:112px}
+.camctl button{width:56px;height:56px;border-radius:50%;border:0;background:rgba(255,255,255,.2);color:#fff;font-size:1.4rem;cursor:pointer}
+.camctl .shutter{width:80px;height:80px;background:var(--red);border:4px solid #fff;font:400 1.25rem/1 var(--display)}
+.camctl .shutter:disabled{opacity:.5}
+.stage.recording .shutter{border-radius:18px}
+@media (orientation:landscape){
+  body.shoot .camctl{flex-direction:column;left:auto;top:0;bottom:0;right:max(16px, env(safe-area-inset-right, 0px))}
+  body.shoot .stage .msg{bottom:12px;right:120px}
+  body.shoot .stage .count{right:110px}
+}
+@media (orientation:portrait){
+  body.shoot .stage .turn{display:block;position:absolute;top:12px;left:50%;transform:translateX(-50%);background:rgba(242,183,5,.92);color:#18203A;border-radius:999px;padding:6px 16px;font-family:var(--display);pointer-events:none;z-index:2;white-space:nowrap}
+  body.shoot .stage.recording .turn{display:none}
+}
 
 .controls{display:flex;gap:8px;margin-top:10px}
 .btn{border:0;border-radius:12px;padding:12px 18px;min-height:52px;cursor:pointer;font-family:var(--display);font-size:1.2rem;background:var(--surface);border:1.5px solid var(--line)}
 .btn.primary{background:var(--red);border-color:var(--red);color:#fff;flex:1}
 .btn.go{background:var(--blue);border-color:var(--blue);color:#fff;flex:1}
 .btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.upl{flex:1;text-align:center;display:flex;align-items:center;justify-content:center}
+.prog{height:12px;border-radius:6px;background:var(--line);overflow:hidden;margin:10px 0}
+.prog i{display:block;height:100%;background:var(--blue);width:0}
 
 /* 결과: 도장이 이 화면의 주인공 */
 .result{margin-top:18px;background:var(--surface);border-radius:16px;padding:18px 16px;border:1.5px solid var(--line)}
@@ -111,6 +140,16 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--re
 .ex .cnt{display:flex;align-items:center;gap:6px;flex:none}
 .ex .cnt button{width:44px;height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper);font-size:1.3rem;cursor:pointer}
 .ex .cnt input{width:64px;text-align:center;border:1.5px solid var(--line);border-radius:10px;min-height:44px;background:var(--paper);font-family:var(--display);font-size:1.2rem}
+.ed{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:10px}
+.ed li{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:8px}
+.ed .r{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ed input[type=text],.ed input[type=number],.ed select{min-height:44px;border:1.5px solid var(--line);border-radius:10px;background:var(--paper);padding:6px 10px;font:inherit;color:inherit}
+.ed .nm{flex:1;min-width:140px;font-family:var(--display);font-size:1.1rem}
+.ed input[type=number]{width:84px}
+.ed .unit{width:70px}
+.ed .r button{min-height:44px;min-width:44px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);cursor:pointer}
+.ed .r .del{color:var(--red)}
+.ed small{color:var(--sub)}
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
 .cal .h{text-align:center;font-size:.85rem;color:var(--sub)}
 .cal .h:first-child{color:var(--red)}
@@ -150,7 +189,7 @@ textarea{width:100%;min-height:64px;background:var(--surface);border:1.5px solid
 .quick .btn{font-size:1rem;min-height:44px;padding:8px 14px}
 [hidden]{display:none!important}
 
-.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;max-width:90vw;z-index:9;font-size:.95rem}
+.toast{z-index:40!important;position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;max-width:90vw;z-index:9;font-size:.95rem}
 .toast:empty{display:none}
 </style>
 </head>
@@ -174,7 +213,12 @@ textarea{width:100%;min-height:64px;background:var(--surface);border:1.5px solid
       <div><div class="big" id="dStreak">0</div><small>일 연속</small></div>
       <div style="flex:1"><div id="dProg" class="hint" style="margin:0 0 6px"></div><div class="bar"><i id="dBar" style="width:0"></i></div></div>
     </div>
+    <div class="row" style="justify-content:space-between;margin-top:16px">
+      <h2 style="margin:0">할 운동</h2>
+      <button class="btn" id="dEditBtn" style="min-height:44px;font-size:1rem">목록 편집</button>
+    </div>
     <ul class="ex" id="dItems"></ul>
+    <div id="dEdit" hidden></div>
     <p class="hint" id="dPoomsae"></p>
     <label class="hint" for="dNote">한 줄 메모</label>
     <textarea id="dNote" placeholder="오늘 운동하면서 느낀 점"></textarea>
@@ -196,6 +240,13 @@ textarea{width:100%;min-height:64px;background:var(--surface);border:1.5px solid
     <div class="seg" role="group" aria-label="모드">
       <button id="mPractice" aria-pressed="true">연습하기</button>
       <button id="mRef" aria-pressed="false">기준 동작 저장 (어른)</button>
+      <button id="mModel" aria-pressed="false">모범 영상</button>
+    </div>
+    <div id="modelBox" hidden>
+      <div class="field"><label for="mLabel">모범 영상 이름</label>
+        <input type="text" id="mLabel" maxlength="40" placeholder="예: 사범님, ○○ 선수 2026 대회"></div>
+      <p class="hint">별점에는 쓰이지 않고, 연습 결과와 다시 보기에서 "모범과 비교"로만 보여요. 고정된 카메라로 같은 품새를 처음부터 끝까지 찍은 영상이 좋아요. 직접 찍었거나 사용 허락을 받은 영상만 올려 주세요.</p>
+      <div id="modelList"></div>
     </div>
 
     <div class="stage mirror" id="stage">
@@ -204,12 +255,21 @@ textarea{width:100%;min-height:64px;background:var(--surface);border:1.5px solid
       <div class="rec">녹화 중</div>
       <div class="count" id="count"></div>
       <div class="msg" id="msg">카메라를 켜고, 머리부터 발끝까지 화면에 들어오게 서 주세요.</div>
+      <div class="turn" aria-hidden="true">휴대폰을 가로로 돌려 주세요</div>
+      <div class="camctl">
+        <button id="btnFlip" aria-label="앞뒤 카메라 바꾸기">↺</button>
+        <button class="shutter" id="btnRec" disabled>시작</button>
+        <button id="btnClose" aria-label="촬영 닫기">✕</button>
+      </div>
     </div>
     <div class="controls">
-      <button class="btn go" id="btnCam">카메라 켜기</button>
-      <button class="btn primary" id="btnRec" disabled>시작</button>
-      <button class="btn" id="btnFlip" aria-label="앞뒤 카메라 바꾸기">↺</button>
+      <button class="btn go" id="btnCam">카메라 켜고 촬영하기</button>
     </div>
+    <div class="controls">
+      <label class="btn upl" for="fileIn">영상 파일로 올리기</label>
+      <input type="file" id="fileIn" accept="video/*" hidden>
+    </div>
+    <p class="hint" id="uplHint">도장에서 찍은 영상이나 사범님 시범 영상을 올리면 같은 방식으로 분석해요. 위 모드(연습하기 / 기준 동작 저장)에 따라 기록돼요.</p>
 
     <div id="result"></div>
   </section>
@@ -304,6 +364,7 @@ function renderPoomsaeSelects() {
 async function setPoomsae(id) {
   S.pid = id; localStorage.setItem('tkd:pid', id);
   renderPoomsaeSelects(); $('result').innerHTML = '';
+  if (S.mode === 'model') renderModelList();
   await refreshRefStatus();
 }
 async function getRef(id) {
@@ -341,7 +402,7 @@ async function startCamera() {
     const v = $('video'); v.srcObject = S.stream; await v.play();
     $('canvas').width = v.videoWidth; $('canvas').height = v.videoHeight;
     $('stage').classList.toggle('mirror', S.facing === 'user');
-    $('btnRec').disabled = false; $('btnCam').textContent = '카메라 끄기';
+    $('btnRec').disabled = false;
     try { S.wake = await navigator.wakeLock?.request('screen'); } catch {}
     try { window.TkdNative?.keepScreenOn(true); } catch {}
     loop();
@@ -354,20 +415,28 @@ function stopCamera() {
   S.stream?.getTracks().forEach((t) => t.stop()); S.stream = null;
   try { S.wake?.release(); } catch {} S.wake = null;
   try { window.TkdNative?.keepScreenOn(false); } catch {}
-  $('btnRec').disabled = true; $('btnCam').textContent = '카메라 켜기';
+  $('btnRec').disabled = true;
   const c = $('canvas'); c.getContext('2d').clearRect(0, 0, c.width, c.height);
 }
 function loop() {
   if (!S.stream) return;
-  const v = $('video'), now = performance.now();
+  const v = $('video'), now = performance.now(), c = $('canvas');
+  // 화면을 돌리면 카메라 영상의 가로세로가 바뀌므로 뼈대 캔버스도 맞춘다
+  if (v.videoWidth && (c.width !== v.videoWidth || c.height !== v.videoHeight)) { c.width = v.videoWidth; c.height = v.videoHeight; }
   if (v.readyState >= 2 && now > S.lastTs) {
-    S.lastTs = now;
-    const res = S.lm.detectForVideo(v, now);
+    const res = S.lm.detectForVideo(v, nextTs(now));
     onPose(res.landmarks?.[0], res.worldLandmarks?.[0], now);
   }
   S.raf = requestAnimationFrame(loop);
 }
-function onPose(img, world, now) {
+// MediaPipe VIDEO 모드는 호출 시각이 계속 증가해야 함
+function nextTs(want) { S.lastTs = Math.max(want, S.lastTs + 1); return S.lastTs; }
+function makeFrame(img, world, t) {
+  const f = frameFeatures(img, world, t, S.cfg.capture.minVisibility);
+  f.p = img ? PTS.flatMap((i) => [+img[i].x.toFixed(3), +img[i].y.toFixed(3), +(img[i].visibility ?? 1).toFixed(2)]) : null;
+  return f;
+}
+function drawSkeleton(img) {
   const c = $('canvas'), g = c.getContext('2d');
   g.clearRect(0, 0, c.width, c.height);
   const minVis = S.cfg.capture.minVisibility;
@@ -378,16 +447,81 @@ function onPose(img, world, now) {
       g.beginPath(); g.moveTo(img[a].x * c.width, img[a].y * c.height); g.lineTo(img[b].x * c.width, img[b].y * c.height); g.stroke();
     }
   }
+}
+function onPose(img, world, now) {
+  drawSkeleton(img);
+  const minVis = S.cfg.capture.minVisibility;
   const full = img && BODY.every((i) => (img[i].visibility ?? 1) >= minVis);
   if (S.rec === 'idle') $('msg').textContent = full ? '좋아요! 시작을 누르세요.' : '머리부터 발끝까지 화면에 들어오게 서 주세요.';
   if (S.rec === 'rec') {
     $('msg').textContent = full ? '' : '몸이 화면 밖으로 나갔어요!';
     if (now - S.lastSample >= 1000 / S.cfg.capture.sampleHz) {
       S.lastSample = now;
-      const f = frameFeatures(img, world, Math.round(now - S.recT0), minVis);
-      f.p = img ? PTS.flatMap((i) => [+img[i].x.toFixed(3), +img[i].y.toFixed(3), +(img[i].visibility ?? 1).toFixed(2)]) : null;
-      S.frames.push(f);
+      S.frames.push(makeFrame(img, world, Math.round(now - S.recT0)));
     }
+  }
+}
+
+// ---------- 영상 파일 분석 ----------
+const VEXT = { 'video/mp4': 'mp4', 'video/quicktime': 'mov', 'video/webm': 'webm', 'video/3gpp': '3gp', 'video/x-matroska': 'mkv', 'video/x-m4v': 'm4v' };
+function fileExt(file) {
+  const m = /\.([a-z0-9]{2,4})$/i.exec(file.name || '');
+  return (m ? m[1].toLowerCase() : VEXT[(file.type || '').split(';')[0]]) || 'mp4';
+}
+function seekTo(v, t) {
+  return new Promise((res) => {
+    const done = () => { clearTimeout(to); v.removeEventListener('seeked', done); res(); };
+    const to = setTimeout(done, 3000);
+    v.addEventListener('seeked', done);
+    v.currentTime = t;
+  });
+}
+let uplCancel = false;
+async function analyzeFile(file) {
+  if (S.rec !== 'idle') return;
+  const maxSec = S.cfg.upload?.maxSec ?? 300;
+  stopCamera();
+  $('btnCam').disabled = true; $('btnRec').disabled = true;
+  S.rec = 'file'; uplCancel = false;
+  const v = $('video'), url = URL.createObjectURL(file);
+  $('result').innerHTML = `<div class="result"><p class="result-title">영상 분석 중…</p>
+    <div class="prog"><i id="uplBar"></i></div><p class="hint" id="uplTxt">동작 인식 준비 중</p>
+    <button class="btn" id="uplStop">그만</button></div>`;
+  $('uplStop').onclick = () => (uplCancel = true);
+  try {
+    await initLandmarker();
+    v.srcObject = null; v.src = url; v.muted = true;
+    await readyVideo(v);
+    const dur = v.duration;
+    if (!Number.isFinite(dur) || dur <= 0) throw new Error('영상 길이를 읽을 수 없어요. mp4 파일로 다시 시도해 주세요.');
+    if (dur > maxSec) throw new Error(`영상이 ${Math.round(dur)}초예요. ${maxSec}초 이하로 잘라서 올려 주세요.`);
+    $('canvas').width = v.videoWidth; $('canvas').height = v.videoHeight;
+    $('stage').classList.remove('mirror');
+    const step = 1 / S.cfg.capture.sampleHz, frames = [];
+    for (let t = 0; t < dur && !uplCancel; t += step) {
+      await seekTo(v, t);
+      const res = S.lm.detectForVideo(v, nextTs(S.lastTs + step * 1000));
+      const img = res.landmarks?.[0], world = res.worldLandmarks?.[0];
+      drawSkeleton(img);
+      frames.push(makeFrame(img, world, Math.round(t * 1000)));
+      $('uplBar').style.width = `${(t / dur) * 100}%`;
+      $('uplTxt').textContent = `${Math.round(t)} / ${Math.round(dur)}초 분석`;
+    }
+    if (uplCancel) { $('result').innerHTML = ''; return; }
+    const ext = fileExt(file);
+    S.recType = { mime: file.type || `video/${ext}`, ext };
+    // 촬영 날짜: 파일 수정 시각이 미래가 아니면 그것을, 아니면 지금
+    const lm = file.lastModified ? new Date(file.lastModified) : null;
+    const at = lm && lm <= new Date() ? lm : new Date();
+    await finish(frames, Promise.resolve(replayOn() ? file : null), { at, facing: 'file' });
+  } catch (e) {
+    $('result').innerHTML = `<div class="result"><p class="result-title">${esc(e.message)}</p></div>`;
+  } finally {
+    S.rec = 'idle';
+    v.removeAttribute('src'); v.load(); URL.revokeObjectURL(url);
+    $('canvas').getContext('2d').clearRect(0, 0, $('canvas').width, $('canvas').height);
+    $('btnCam').disabled = false;
+    $('msg').textContent = '카메라를 켜고, 머리부터 발끝까지 화면에 들어오게 서 주세요.';
   }
 }
 
@@ -430,23 +564,65 @@ function stopVideo() {
     mr.stop();
   });
 }
-function stopRecording() {
+// 촬영 모드: 가로 고정 + 영상이 화면 전체 (APK는 시스템 바도 숨김)
+function enterShoot() {
+  document.body.classList.add('shoot');
+  if (window.TkdNative?.shootMode) { try { window.TkdNative.shootMode(true); } catch {} return Promise.resolve(); }
+  // 브라우저: 전체 화면일 때만 방향 고정 가능 (iPhone은 불가 → 화면에 "가로로 돌려 주세요" 안내)
+  const fs = document.documentElement.requestFullscreen?.({ navigationUI: 'hide' });
+  return Promise.resolve(fs).then(() => screen.orientation?.lock?.('landscape')).catch(() => {});
+}
+function exitShoot() {
+  document.body.classList.remove('shoot');
+  try { window.TkdNative?.shootMode?.(false); } catch {}
+  try { screen.orientation?.unlock?.(); } catch {}
+  if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+}
+async function openShoot() {
+  await enterShoot();
+  await new Promise((r) => setTimeout(r, 400)); // 화면이 가로로 돈 다음 카메라를 켜야 영상도 가로로 나옴
+  await startCamera();
+  if (!S.stream) exitShoot();
+}
+function closeShoot() {
+  if (S.rec === 'rec' || S.rec === 'count') stopRecording(true);
+  stopCamera(); exitShoot();
+}
+// 안드로이드 뒤로 가기: 촬영 중이면 촬영 닫기, 다른 탭이면 오늘 운동으로
+window.tkdBack = () => {
+  if (document.body.classList.contains('shoot')) { closeShoot(); return true; }
+  if ($('v-daily').hidden) { show('daily'); return true; }
+  return false;
+};
+
+function stopRecording(discard = false) {
   clearInterval(S.timer); clearTimeout(S.timer);
-  const wasRec = S.rec === 'rec';
+  const wasRec = S.rec === 'rec' && !discard;
   const blobP = stopVideo();
   S.rec = 'idle'; $('count').textContent = '';
   $('stage').classList.remove('recording');
   $('btnRec').textContent = '시작'; $('btnCam').disabled = false;
-  if (wasRec) finish(S.frames.slice(), blobP);
+  if (wasRec) {
+    // 녹화가 끝나면 촬영 화면을 닫고 결과를 보여 준다 (다시 하려면 "카메라 켜고 촬영하기")
+    exitShoot();
+    blobP.finally(() => stopCamera());
+    finish(S.frames.slice(), blobP);
+  }
 }
 
-async function finish(frames, blobP) {
+// opts: { at: 촬영 시각(Date), facing: 'user'|'environment'|'file' }
+async function finish(frames, blobP, opts = {}) {
+  const at = opts.at || new Date();
   const m = computeMetrics(frames);
   if (m.error) { $('result').innerHTML = `<div class="result"><p class="result-title">${esc(m.error)}</p></div>`; return; }
   const seq = frames.filter((f) => f.ok).map((f) => ({ t: f.t, a: f.a.map((x) => Math.round(x)) }));
+  if (S.mode === 'model') {
+    const { id, label } = await saveModel(seq, m, at);
+    return saveVideo('model', id, frames, m, null, blobP, at, opts.facing, { label });
+  }
   if (S.mode === 'ref') {
     await saveReference(seq, m);
-    return saveVideo('ref', Date.now().toString(36), frames, m, null, blobP);
+    return saveVideo('ref', Date.now().toString(36), frames, m, null, blobP, at, opts.facing);
   }
 
   const p = P(), mc = S.cfg.metrics;
@@ -467,30 +643,33 @@ async function finish(frames, blobP) {
   const scored = items.filter((i) => i.stars > 0);
   const total = scored.reduce((s, i) => s + i.stars, 0), max = scored.length * 3;
   const record = {
-    id: Date.now().toString(36), at: new Date().toISOString(), poomsaeId: S.pid, cfgVersion: S.cfg.version,
+    id: Date.now().toString(36), at: at.toISOString(), poomsaeId: S.pid, cfgVersion: S.cfg.version,
     duration: m.duration, validRatio: +(m.validFrames / m.totalFrames).toFixed(2),
     values: m.values, stars: Object.fromEntries(items.map((i) => [i.id, i.stars])),
     ref: refRes ? { meanErr: refRes.meanErr, worstJoint: refRes.worstJointName, worstAtSec: refRes.worstAtSec, tempo: refRes.tempo } : null,
-    total, max,
+    total, max, ...(opts.facing === 'file' ? { src: 'file' } : {}),
   };
   renderResult(items, record, refRes);
+  renderModelCompare(m.values, seq);
   try {
     await S.store.update(`records/${S.child}.json`, (d) => { d.records.push(record); return d; }, { records: [] },
       `기록: ${childName()} ${p.name} ${total}/${max}`);
     $('saveState').textContent = `${S.store.label}에 저장했어요.`;
   } catch (e) { $('saveState').textContent = `저장 실패: ${e.message}`; }
-  await saveVideo('practice', record.id, frames, m, { total, max }, blobP);
+  await saveVideo('practice', record.id, frames, m, { total, max }, blobP, at, opts.facing);
 }
 
 // 영상 + 관절 데이터를 이 기기에 저장 (기준 동작 영상은 ref/{품새}/ 아래)
-async function saveVideo(kind, id, frames, m, score, blobP) {
+async function saveVideo(kind, id, frames, m, score, blobP, at = new Date(), facing = S.facing, extra = {}) {
   const el = () => $('vidState');
   const blob = await blobP;
   if (!blob) { if (el()) el().textContent = ''; return; }
-  const at = new Date(), ext = S.recType.ext;
-  const base = kind === 'ref' ? `ref/${S.pid}/${fileStamp(at)}_${id}` : `${S.child}/${S.pid}/${fileStamp(at)}_${id}`;
-  const meta = { v: 1, id, kind, at: at.toISOString(), child: kind === 'ref' ? null : S.child, childName: kind === 'ref' ? '사범님 기준' : childName(),
-    pid: S.pid, pname: P().name, ext, mime: blob.type, duration: m.duration, facing: S.facing, score, frames };
+  const ext = S.recType.ext;
+  const folder = kind === 'practice' ? S.child : kind; // ref/ · model/ · {아이id}/
+  const base = `${folder}/${S.pid}/${fileStamp(at)}_${id}`;
+  const who = kind === 'ref' ? '사범님 기준' : kind === 'model' ? extra.label : childName();
+  const meta = { v: 1, id, kind, at: at.toISOString(), child: kind === 'practice' ? S.child : null, childName: who,
+    pid: S.pid, pname: P().name, ext, mime: blob.type, duration: m.duration, facing, score, frames, ...extra };
   if (el()) el().textContent = '영상 저장 중…';
   try {
     await S.vs.save(base, ext, blob, meta);
@@ -530,11 +709,83 @@ function renderResult(items, rec, refRes) {
   $('result').innerHTML = `<div class="result">
     <div class="result-top">${stampSVG(pct)}
       <div><p class="result-title">${esc(childName())}, 별 ${rec.total}개!</p>
-      <p class="hint">${esc(P().name)} · ${rec.duration}초 · 몸이 보인 비율 ${Math.round(rec.validRatio * 100)}%</p></div></div>
+      <p class="hint">${esc(P().name)} · ${rec.src === 'file' ? `${new Date(rec.at).toLocaleDateString('ko-KR')} 영상 · ` : ''}${rec.duration}초 · 몸이 보인 비율 ${Math.round(rec.validRatio * 100)}%</p></div></div>
     ${tempoMsg ? `<p>${esc(tempoMsg)}</p>` : ''}
     <ul class="items">${li}</ul>
-    <p class="hint" id="saveState">저장 중…</p><p class="hint" id="vidState"></p></div>`;
+    <p class="hint" id="saveState">저장 중…</p><p class="hint" id="vidState"></p><div id="modelCmp"></div></div>`;
   $('result').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+}
+
+// ---------- 모범 영상 ----------
+S.models = {};
+async function getModels(pid, force = false) {
+  if (force || !(pid in S.models)) {
+    try { S.models[pid] = (await S.store.read(`models/${pid}.json`))?.data?.models ?? []; }
+    catch (e) { toast(e.message); return []; }
+  }
+  return S.models[pid];
+}
+const modelLabel = () => $('mLabel').value.trim();
+function needLabel() {
+  if (S.mode !== 'model' || modelLabel()) return false;
+  toast('모범 영상 이름을 먼저 적어 주세요.'); $('mLabel').focus(); return true;
+}
+async function saveModel(seq, m, at) {
+  const label = modelLabel(), id = Date.now().toString(36);
+  const entry = { id, label, savedAt: at.toISOString(), duration: m.duration, values: m.values, cfgVersion: S.cfg.version, seq };
+  $('result').innerHTML = `<div class="result"><p class="result-title">모범 영상 "${esc(label)}" (${esc(P().name)}, ${m.duration}초)</p>
+    <p class="hint">${P().metrics.map((k) => `${esc(S.cfg.metrics[k].label)} ${fmt(m.values[k], S.cfg.metrics[k].unit)}`).join(' · ')}</p>
+    <p class="hint" id="saveState">저장 중…</p><p class="hint" id="vidState"></p></div>`;
+  try {
+    await S.store.update(`models/${S.pid}.json`, (d) => { d.models.push(entry); return d; }, { models: [] }, `모범 영상: ${P().name} ${label}`);
+    delete S.models[S.pid];
+    $('saveState').textContent = `${S.store.label}에 저장했어요. 이제 연습 결과에 "모범과 비교"가 나와요.`;
+    renderModelList();
+  } catch (e) { $('saveState').textContent = `저장 실패: ${e.message}`; }
+  return { id, label };
+}
+async function renderModelList() {
+  const ms = await getModels(S.pid);
+  $('modelList').innerHTML = ms.length
+    ? `<p class="hint" style="margin-bottom:0">${esc(P().name)}에 저장된 모범 영상</p><ul class="mlist">${ms.map((x) =>
+        `<li><span>${esc(x.label)} <small class="hint">${new Date(x.savedAt).toLocaleDateString('ko-KR')} · ${x.duration}초</small></span><button data-mdel="${esc(x.id)}">삭제</button></li>`).join('')}</ul>`
+    : `<p class="hint">${esc(P().name)}에는 아직 모범 영상이 없어요.</p>`;
+  $('modelList').querySelectorAll('[data-mdel]').forEach((b) => (b.onclick = async () => {
+    const x = ms.find((y) => y.id === b.dataset.mdel);
+    if (!confirm(`모범 영상 "${x.label}"을 지울까요? 비교 데이터와 이 기기의 영상이 함께 지워져요.`)) return;
+    try {
+      await S.store.update(`models/${S.pid}.json`, (d) => { d.models = d.models.filter((y) => y.id !== x.id); return d; }, { models: [] }, `모범 영상 삭제: ${x.label}`);
+      const clip = ((await S.vs.list('model', S.pid)) || []).find((c) => c.meta.id === x.id);
+      if (clip) await S.vs.remove(clip.base, clip.meta.ext);
+      delete S.models[S.pid]; renderModelList();
+    } catch (e) { toast(`삭제 실패: ${e.message}`); }
+  }));
+}
+// 모범 대비 표현: 크기가 의미 있는 값은 %, 각도 차이가 의미 있는 값은 °
+function vsModel(k, v, mv) {
+  if (!Number.isFinite(v) || !Number.isFinite(mv)) return '—';
+  if (k === 'stance') { const a = 180 - v, b = 180 - mv; return b > 0 ? `무릎 굽힘이 모범의 ${Math.round((a / b) * 100)}%` : '—'; }
+  if (k === 'kick') return mv > 0 ? `발차기 높이가 모범의 ${Math.round((v / mv) * 100)}%` : '—';
+  const d = Math.round(v - mv), better = S.cfg.metrics[k]?.better;
+  if (better === 'higher') return d >= 0 ? '모범만큼 했어요' : `모범보다 ${-d}° 모자라요`;
+  return d <= 0 ? '모범만큼 했어요' : `모범보다 ${d}° 더 커요`;
+}
+async function renderModelCompare(values, seq) {
+  const box = $('modelCmp'); if (!box) return;
+  const ms = await getModels(S.pid);
+  if (!ms.length) { box.innerHTML = `<p class="hint">모범 영상을 추가하면 여기에 모범과 비교가 나와요 (별점과는 별개).</p>`; return; }
+  const pick = localStorage.getItem(`tkd:model:${S.pid}`);
+  const cur = ms.find((x) => x.id === pick) || ms.at(-1);
+  const sel = ms.length > 1 ? `<select id="mPick" aria-label="비교할 모범 영상">${ms.map((x) => `<option value="${esc(x.id)}" ${x === cur ? 'selected' : ''}>${esc(x.label)}</option>`).join('')}</select>` : `<b>${esc(cur.label)}</b>`;
+  const rows = P().metrics.map((k) => {
+    const d = S.cfg.metrics[k];
+    return `<tr><td>${esc(d.label)}</td><td class="n">${fmt(values[k], d.unit)} / ${fmt(cur.values?.[k], d.unit)}</td><td>${esc(vsModel(k, values[k], cur.values?.[k]))}</td></tr>`;
+  }).join('');
+  const dtw = cur.seq?.length ? compareToReference(seq, cur.seq) : null;
+  const flow = dtw ? `<p class="hint">동작 흐름: 관절 각도 차이 평균 ${dtw.meanErr}° · 가장 다른 곳 ${Math.round(dtw.worstAtSec)}초쯤 ${esc(dtw.worstJointName)} · 빠르기 비 ${dtw.tempo}</p>` : '';
+  box.innerHTML = `<h2 style="margin:18px 0 4px">모범과 비교</h2><div class="row">${sel}</div>
+    <table class="mcmp"><tr><th></th><th class="n">나 / 모범</th><th></th></tr>${rows}</table>${flow}`;
+  $('mPick')?.addEventListener('change', (e) => { localStorage.setItem(`tkd:model:${S.pid}`, e.target.value); renderModelCompare(values, seq); });
 }
 
 async function saveReference(seq, m) {
@@ -579,6 +830,7 @@ const R = { list: [], a: null, b: null, map: null, raf: 0, skel: true, mirror: t
 const fmtT = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 const clipName = (it) => {
   if (it.meta.kind === 'ref') return '사범님 기준';
+  if (it.meta.kind === 'model') return `모범: ${it.meta.label || ''}`;
   const d = new Date(it.meta.at), p = (n) => String(n).padStart(2, '0');
   return `${d.getMonth() + 1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`;
 };
@@ -592,15 +844,18 @@ async function renderReplayList() {
     return;
   }
   let mine = [], refs = [];
-  try { [mine, refs] = await Promise.all([S.vs.list(S.child, pid), S.vs.list('ref', pid)]); }
+  let models = [];
+  try { [mine, refs, models] = await Promise.all([S.vs.list(S.child, pid), S.vs.list('ref', pid), S.vs.list('model', pid)]); }
   catch (e) { box.innerHTML = `<p class="hint">영상 목록을 읽지 못했어요: ${esc(e.message)}</p>`; return; }
   mine = mine || []; refs = refs || [];
-  R.list = [...refs, ...mine];
+  models = models || [];
+  R.list = [...refs, ...models, ...mine];
   R.pick.clear();
   if (!R.list.length) { box.innerHTML = '<p class="hint">이 기기에 저장된 영상이 아직 없어요. 품새 탭에서 연습하면 영상이 함께 저장돼요.</p>'; return; }
   const q = [];
   if (mine.length >= 2) q.push(`<button class="btn" data-q="firstlast">처음 vs 최근</button>`);
   if (mine.length && refs.length) q.push(`<button class="btn" data-q="ref">최근 vs 사범님</button>`);
+  if (mine.length && models.length) q.push(`<button class="btn" data-q="model">최근 vs 모범</button>`);
   q.push(`<button class="btn go" id="btnCmp" disabled>고른 2개 비교</button>`);
   const rows = R.list.slice().reverse().map((it) => {
     const i = R.list.indexOf(it);
@@ -611,6 +866,10 @@ async function renderReplayList() {
   box.innerHTML = `<div class="quick">${q.join('')}</div><ul class="vlist">${rows}</ul>`;
   box.querySelector('[data-q="firstlast"]')?.addEventListener('click', () => openReplay(mine.at(-1), mine[0]));
   box.querySelector('[data-q="ref"]')?.addEventListener('click', () => openReplay(mine.at(-1), refs.at(-1)));
+  box.querySelector('[data-q="model"]')?.addEventListener('click', () => {
+    const pick = localStorage.getItem(`tkd:model:${pid}`);
+    openReplay(mine.at(-1), models.find((x) => x.meta.id === pick) || models.at(-1));
+  });
   box.querySelectorAll('input[type=checkbox]').forEach((c) => (c.onchange = () => {
     c.checked ? R.pick.add(+c.dataset.i) : R.pick.delete(+c.dataset.i);
     $('btnCmp').disabled = R.pick.size !== 2;
@@ -628,7 +887,7 @@ async function renderReplayList() {
 async function exportClip(it) {
   try {
     const blob = S.vs.kind === 'native' ? null : await S.vs.video(it.base, it.meta.ext);
-    const who = it.meta.kind === 'ref' ? '사범님' : it.meta.childName;
+    const who = it.meta.kind === 'ref' ? '사범님' : it.meta.kind === 'model' ? `모범_${it.meta.label || ''}` : it.meta.childName;
     const name = `${who}_${it.meta.pname}_${fileStamp(new Date(it.meta.at))}.${it.meta.ext}`.replace(/\s/g, '');
     if (S.vs.kind === 'native') { S.vs.shareNative(it.base, it.meta.ext, name); return; }
     const file = new File([blob], name, { type: blob.type || it.meta.mime });
@@ -692,6 +951,7 @@ async function openReplay(itA, itB) {
     if (two) {
       R.b = await loadClip(itB, $('player').querySelector('[data-k="b"]'));
       R.map = alignTimes(R.a.frames, R.b.frames);
+      if (R.a.c.width > R.a.c.height) $('player').querySelector('.pv-row').classList.remove('two');
     }
   } catch (e) { $('player').innerHTML = `<p class="hint">영상을 열지 못했어요: ${esc(e.message)}</p>`; return; }
   const A = R.a.v;
@@ -776,16 +1036,22 @@ const dayKey = (d) => d.toLocaleDateString('sv-SE'); // 기기 시간대 기준 
 const addDays = (key, n) => { const [y, m, d] = key.split('-').map(Number); return dayKey(new Date(y, m - 1, d + n)); };
 const today = () => dayKey(new Date());
 const D = { date: today(), month: today().slice(0, 7), data: { days: {} }, recs: [], dirty: new Set(), timer: 0 };
-const dItems = () => S.cfg.daily?.items ?? [];
+const dItems = () => D.items ?? S.cfg.daily?.items ?? [];
+const goalOk = (g, v) => (g === true ? v === true : Number(v) >= g);
+// 그날 기준 목표 스냅숏 {항목id: true(체크) | 목표수} — 나중에 목록을 바꿔도 지난 날 판정이 바뀌지 않게
+function goalSnapshot() {
+  return Object.fromEntries(dItems().filter((i) => !i.optional).map((i) => [i.id, i.type === 'check' ? true : (i.goal ?? 1)]));
+}
 
 function itemDone(it, v) { return it.type === 'check' ? v === true : Number(v) >= (it.goal ?? 1); }
 function recsOn(key) { return D.recs.filter((r) => dayKey(new Date(r.at)) === key); }
 // 날짜 상태: full = 필수 항목 목표 모두 달성, part = 하나라도 운동(품새 연습 포함), none
 function dayState(key) {
-  const v = D.data.days[key]?.v ?? {};
-  const req = dItems().filter((i) => !i.optional);
-  if (req.length && req.every((i) => itemDone(i, v[i.id]))) return 'full';
-  const any = dItems().some((i) => (i.type === 'check' ? v[i.id] === true : Number(v[i.id]) > 0));
+  const e = D.data.days[key], v = e?.v ?? {};
+  const g = key !== today() && e?.g ? e.g : goalSnapshot();
+  const ids = Object.keys(g);
+  if (ids.length && ids.every((id) => goalOk(g[id], v[id]))) return 'full';
+  const any = Object.values(v).some((x) => x === true || Number(x) > 0);
   return any || recsOn(key).length ? 'part' : 'none';
 }
 function streak() {
@@ -798,16 +1064,19 @@ function streak() {
 async function loadDaily() {
   $('dSave').textContent = '불러오는 중…';
   try {
-    const [d, r] = await Promise.all([S.store.read(`daily/${S.child}.json`), S.store.read(`records/${S.child}.json`)]);
+    const [d, r, it] = await Promise.all([S.store.read(`daily/${S.child}.json`), S.store.read(`records/${S.child}.json`),
+      S.store.read(`daily-items/${S.child}.json`)]);
     D.data = d?.data ?? { days: {} }; D.recs = r?.data.records ?? [];
+    D.items = it?.data?.items?.length ? it.data.items : null;
     $('dSave').textContent = '';
-  } catch (e) { D.data = { days: {} }; D.recs = []; $('dSave').textContent = e.message; }
+  } catch (e) { D.data = { days: {} }; D.recs = []; D.items = null; $('dSave').textContent = e.message; }
+  closeEditor();
   renderDaily();
 }
 function setVal(id, val) {
   const wasFull = dayState(D.date) === 'full';
   const e = (D.data.days[D.date] ??= { v: {} });
-  e.v[id] = val; e.at = new Date().toISOString();
+  e.v[id] = val; e.at = new Date().toISOString(); e.g = goalSnapshot();
   markDirty();
   renderDaily();
   if (!wasFull && dayState(D.date) === 'full') toast(`${childName()}, 오늘 목표를 모두 채웠어요!`);
@@ -865,6 +1134,80 @@ function renderDaily() {
   renderCalendar();
 }
 
+// ---------- 운동 목록 편집 ----------
+let E = null;
+const newId = () => 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+function openEditor() { E = dItems().map((i) => ({ ...i })); renderEditor(); }
+function closeEditor() { E = null; $('dEdit').hidden = true; $('dItems').hidden = false; $('dEditBtn').hidden = false; }
+function renderEditor() {
+  $('dItems').hidden = true; $('dEditBtn').hidden = true; $('dEdit').hidden = false;
+  const others = S.cfg.children.filter((c) => c.id !== S.child);
+  const rows = E.map((it, i) => {
+    const cnt = it.type !== 'check';
+    return `<li data-i="${i}">
+      <div class="r"><input type="text" class="nm" data-f="name" value="${esc(it.name)}" placeholder="운동 이름" aria-label="운동 이름">
+        <select data-f="type" aria-label="기록 방식"><option value="check" ${cnt ? '' : 'selected'}>했다/안 했다</option><option value="count" ${cnt ? 'selected' : ''}>횟수·시간</option></select></div>
+      ${cnt ? `<div class="r"><small>목표</small><input type="number" min="1" data-f="goal" value="${it.goal ?? 10}" aria-label="목표">
+        <input type="text" class="unit" data-f="unit" value="${esc(it.unit ?? '')}" placeholder="단위" aria-label="단위"></div>
+        <div class="r"><small>＋/− 한 번에</small><input type="number" min="1" data-f="step" value="${it.step ?? 1}" aria-label="버튼 한 번에 바뀌는 양"></div>` : ''}
+      <div class="r"><label><input type="checkbox" data-f="optional" ${it.optional ? 'checked' : ''}> 선택 항목 (목표 판정에서 빼기)</label></div>
+      <div class="r"><button data-mv="-1" aria-label="위로" ${i === 0 ? 'disabled' : ''}>↑</button><button data-mv="1" aria-label="아래로" ${i === E.length - 1 ? 'disabled' : ''}>↓</button>
+        <span style="flex:1"></span><button class="del" data-rm aria-label="삭제">삭제</button></div></li>`;
+  }).join('');
+  $('dEdit').innerHTML = `<ul class="ed">${rows}</ul>
+    <div class="controls"><button class="btn" id="eAdd">+ 운동 추가</button></div>
+    ${others.length ? `<p><label><input type="checkbox" id="eAll"> ${others.map((c) => esc(c.name)).join(', ')}에게도 같은 목록 적용</label></p>` : ''}
+    <p class="hint">이름만 바꾸면 지난 기록이 그대로 이어져요. 삭제해도 지난 기록은 파일에 남고, 지난 날의 목표 달성 여부는 바뀌지 않아요.</p>
+    <div class="controls"><button class="btn" id="eCancel">취소</button><button class="btn go" id="eSave">저장</button></div>
+    <p class="hint" id="eMsg"></p>`;
+  $('dEdit').querySelectorAll('li').forEach((li) => {
+    const it = E[+li.dataset.i];
+    li.querySelectorAll('[data-f]').forEach((el) => {
+      const f = el.dataset.f;
+      el.oninput = el.onchange = () => {
+        if (f === 'optional') it.optional = el.checked;
+        else if (f === 'goal' || f === 'step') it[f] = Math.max(1, Math.round(Number(el.value) || 1));
+        else it[f] = el.value;
+        if (f === 'type') {
+          if (it.type === 'count') { it.goal ??= 10; it.step ??= 1; it.unit ??= '번'; }
+          renderEditor();
+        }
+      };
+    });
+    li.querySelectorAll('[data-mv]').forEach((b) => (b.onclick = () => {
+      const i = +li.dataset.i, j = i + Number(b.dataset.mv);
+      [E[i], E[j]] = [E[j], E[i]]; renderEditor();
+    }));
+    li.querySelector('[data-rm]').onclick = () => {
+      if (confirm(`"${it.name || '이름 없음'}"을 목록에서 뺄까요?`)) { E.splice(+li.dataset.i, 1); renderEditor(); }
+    };
+  });
+  $('eAdd').onclick = () => { E.push({ id: newId(), name: '', type: 'count', goal: 10, unit: '번', step: 1 }); renderEditor(); $('dEdit').querySelector('li:last-child .nm')?.focus(); };
+  $('eCancel').onclick = () => { closeEditor(); renderDaily(); };
+  $('eSave').onclick = saveEditor;
+}
+async function saveEditor() {
+  const items = E.map((it) => {
+    const o = { id: it.id || newId(), name: String(it.name || '').trim(), type: it.type === 'check' ? 'check' : 'count' };
+    if (o.type === 'count') { o.goal = it.goal ?? 10; o.unit = String(it.unit ?? '').trim(); o.step = it.step ?? 1; }
+    if (it.optional) o.optional = true;
+    return o;
+  });
+  if (!items.length) { $('eMsg').textContent = '운동이 하나는 있어야 해요.'; return; }
+  if (items.some((i) => !i.name)) { $('eMsg').textContent = '이름이 빈 운동이 있어요.'; return; }
+  const targets = [S.child, ...($('eAll')?.checked ? S.cfg.children.filter((c) => c.id !== S.child).map((c) => c.id) : [])];
+  $('eSave').disabled = true; $('eMsg').textContent = '저장 중…';
+  try {
+    await flushDaily();
+    for (const id of targets) {
+      const name = S.cfg.children.find((c) => c.id === id)?.name ?? id;
+      await S.store.update(`daily-items/${id}.json`, () => ({ items, updatedAt: new Date().toISOString() }), {}, `운동 목록: ${name}`);
+    }
+    D.items = items; closeEditor(); renderDaily();
+    toast(`${S.store.label}에 운동 목록을 저장했어요.`);
+  } catch (e) { $('eMsg').textContent = `저장 실패: ${e.message}`; $('eSave').disabled = false; }
+}
+
 function renderCalendar() {
   const [y, m] = D.month.split('-').map(Number);
   $('calTitle').textContent = `${y}년 ${m}월`;
@@ -890,7 +1233,7 @@ function show(v) {
   ['daily', 'practice', 'records', 'settings'].forEach((k) => ($(`v-${k}`).hidden = k !== v));
   if (v !== 'daily') flushDaily();
   if (v === 'daily') loadDaily();
-  if (v !== 'practice') { if (S.rec !== 'idle') stopRecording(); stopCamera(); }
+  if (v !== 'practice') { if (S.rec === 'file') uplCancel = true; else if (S.rec !== 'idle') stopRecording(true); stopCamera(); exitShoot(); }
   if (v === 'records') { $('rSel').value = S.pid; renderRecords(); }
   if (v !== 'records') closeReplay();
   if (v === 'settings') { fillSettings(); renderVideoSettings(); }
@@ -906,6 +1249,9 @@ function fillSettings() {
 function setMode(m) {
   S.mode = m;
   $('mPractice').setAttribute('aria-pressed', m === 'practice'); $('mRef').setAttribute('aria-pressed', m === 'ref');
+  $('mModel').setAttribute('aria-pressed', m === 'model');
+  $('modelBox').hidden = m !== 'model';
+  if (m === 'model') renderModelList();
   $('result').innerHTML = '';
 }
 
@@ -913,6 +1259,7 @@ document.querySelectorAll('nav.tabs button').forEach((b) => (b.onclick = () => s
 $('dPrev').onclick = () => { D.date = addDays(D.date, -1); D.month = D.date.slice(0, 7); renderDaily(); };
 $('dNext').onclick = () => { if (D.date < today()) { D.date = addDays(D.date, 1); D.month = D.date.slice(0, 7); renderDaily(); } };
 $('cPrev').onclick = () => shiftMonth(-1);
+$('dEditBtn').onclick = openEditor;
 $('cNext').onclick = () => shiftMonth(1);
 $('dNote').oninput = () => { const e = (D.data.days[D.date] ??= { v: {} }); e.note = $('dNote').value; e.at = new Date().toISOString(); markDirty(); };
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushDaily(); });
@@ -926,12 +1273,16 @@ $('btnFolder').onclick = async () => {
 $('btnAppStore').onclick = async () => { await S.vs.useApp(); toast('앞으로 영상은 앱 저장공간에 저장돼요. 폴더에 있던 영상은 그대로 남아 있어요.'); renderVideoSettings(); };
 $('mPractice').onclick = () => setMode('practice');
 $('mRef').onclick = () => setMode('ref');
-$('btnCam').onclick = () => (S.stream ? stopCamera() : startCamera());
+$('mModel').onclick = () => setMode('model');
+$('btnCam').onclick = () => { if (S.stream) closeShoot(); else if (!needLabel()) openShoot(); };
+$('btnClose').onclick = closeShoot;
 $('btnRec').onclick = () => (S.rec === 'idle' ? startCountdown() : stopRecording());
+document.querySelector('label[for="fileIn"]').addEventListener('click', (e) => { if (needLabel()) e.preventDefault(); });
+$('fileIn').onchange = (e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f && !needLabel()) analyzeFile(f); };
 $('btnFlip').onclick = () => { S.facing = S.facing === 'user' ? 'environment' : 'user'; if (S.stream) startCamera(); };
 $('btnSave').onclick = async () => {
   const s = { owner: $('sOwner').value.trim(), repo: $('sRepo').value.trim(), branch: $('sBranch').value.trim(), token: $('sToken').value.trim() };
-  saveSettings(s); S.store = new Store(s); S.refs = {};
+  saveSettings(s); S.store = new Store(s); S.refs = {}; S.models = {};
   $('sState').textContent = '확인 중…';
   try { $('sState').textContent = await S.store.test(); } catch (e) { $('sState').textContent = e.message; }
   refreshRefStatus();

@@ -5,11 +5,17 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 
@@ -260,6 +266,35 @@ public class NativeBridge {
             send.putExtra(Intent.EXTRA_STREAM, u);
             send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             act.startActivity(Intent.createChooser(send, title));
+        });
+    }
+
+    /** 촬영 모드: 가로 고정 + 상태바·내비게이션바 숨김 + 화면 켜짐 */
+    @SuppressWarnings("deprecation")
+    @JavascriptInterface
+    public void shootMode(boolean on) {
+        act.runOnUiThread(() -> {
+            act.setRequestedOrientation(on ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                    : ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+            Window w = act.getWindow();
+            if (Build.VERSION.SDK_INT >= 30) {
+                WindowInsetsController c = w.getInsetsController();
+                if (c != null) {
+                    if (on) {
+                        c.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                        c.hide(WindowInsets.Type.systemBars());
+                    } else {
+                        c.show(WindowInsets.Type.systemBars());
+                    }
+                }
+            } else {
+                View d = w.getDecorView();
+                int f = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+                int cur = d.getSystemUiVisibility();
+                d.setSystemUiVisibility(on ? (cur | f) : (cur & ~f));
+            }
+            if (on) w.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            else w.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         });
     }
 

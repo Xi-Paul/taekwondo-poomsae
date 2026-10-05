@@ -1,0 +1,350 @@
+{
+  "version": "2026.10.03",
+  "children": [
+    {
+      "id": "siyun",
+      "name": "시윤"
+    },
+    {
+      "id": "haeyun",
+      "name": "해윤"
+    }
+  ],
+  "capture": {
+    "sampleHz": 15,
+    "countdownSec": 5,
+    "maxSec": 120,
+    "minVisibility": 0.5,
+    "model": "full"
+  },
+  "replay": {
+    "enabled": true,
+    "bitrate": 2000000
+  },
+  "daily": {
+    "items": [
+      {
+        "id": "stretch",
+        "name": "스트레칭",
+        "type": "check"
+      },
+      {
+        "id": "jumprope",
+        "name": "줄넘기",
+        "type": "count",
+        "unit": "개",
+        "goal": 200,
+        "step": 10
+      },
+      {
+        "id": "kick",
+        "name": "발차기 연습",
+        "type": "count",
+        "unit": "번",
+        "goal": 50,
+        "step": 5
+      },
+      {
+        "id": "poomsae",
+        "name": "품새 해 보기",
+        "type": "count",
+        "unit": "번",
+        "goal": 3,
+        "step": 1
+      },
+      {
+        "id": "dojang",
+        "name": "태권도장 가기",
+        "type": "check",
+        "optional": true
+      }
+    ]
+  },
+  "metrics": {
+    "stance": {
+      "label": "낮게 서기",
+      "what": "발차기 중이 아닐 때, 더 굽힌 무릎 각도의 하위 10%",
+      "unit": "°",
+      "better": "lower",
+      "stars3": 135,
+      "stars2": 155,
+      "msg": {
+        "3": "자세가 낮고 튼튼해요!",
+        "2": "좋아요! 앞굽이에서 앞 무릎을 조금만 더 굽혀 볼까?",
+        "1": "앞굽이를 할 때 앞 무릎을 쭉 굽혀서 낮게 서 봐요."
+      }
+    },
+    "punch": {
+      "label": "팔 쭉 뻗기",
+      "what": "더 편 팔꿈치 각도의 상위 10% (180° = 완전히 폄)",
+      "unit": "°",
+      "better": "higher",
+      "stars3": 165,
+      "stars2": 150,
+      "msg": {
+        "3": "지르기가 쭉쭉 뻗었어요!",
+        "2": "지르기 끝에서 팔을 조금 더 펴 볼까?",
+        "1": "주먹을 지를 때 팔꿈치를 끝까지 쭉 펴 봐요."
+      }
+    },
+    "kick": {
+      "label": "앞차기 높이",
+      "what": "차는 발목 높이 ÷ 골반 높이 (1.0 = 골반 높이까지 참)",
+      "unit": "",
+      "better": "higher",
+      "stars3": 0.9,
+      "stars2": 0.6,
+      "msg": {
+        "3": "앞차기가 높이 올라갔어요!",
+        "2": "무릎을 먼저 높이 들고 차면 더 높아져요.",
+        "1": "앞차기는 무릎을 가슴 쪽으로 들어 올린 다음 차 봐요."
+      }
+    },
+    "posture": {
+      "label": "허리 펴기",
+      "what": "몸통이 수직선에서 기울어진 각도의 상위 10%",
+      "unit": "°",
+      "better": "lower",
+      "stars3": 10,
+      "stars2": 18,
+      "msg": {
+        "3": "허리가 곧게 서 있어요!",
+        "2": "동작할 때 허리를 조금 더 세워 볼까?",
+        "1": "몸이 앞으로 숙여져요. 가슴을 펴고 허리를 세워 봐요."
+      }
+    },
+    "reference": {
+      "label": "사범님 동작 따라하기",
+      "what": "기준 동작과 관절 8곳 각도 차이 평균 (빠르기 차이는 맞춘 뒤 비교)",
+      "unit": "°",
+      "better": "lower",
+      "stars3": 12,
+      "stars2": 20,
+      "msg": {
+        "3": "사범님 동작이랑 거의 똑같아요!",
+        "2": "많이 비슷해요! {at}초쯤 {joint} 움직임을 다시 맞춰 봐요.",
+        "1": "{at}초쯤 {joint} 움직임이 많이 달라요. 사범님 동작을 다시 보고 해 봐요."
+      }
+    }
+  },
+  "tempo": {
+    "slowRatio": 1.3,
+    "fastRatio": 0.75,
+    "slowMsg": "기준보다 느렸어요. 동작을 끊지 말고 이어서 해 봐요.",
+    "fastMsg": "기준보다 빨랐어요. 동작 하나하나를 또박또박 끝내 봐요."
+  },
+  "stamp": [
+    {
+      "minPercent": 85,
+      "text": "참 잘했어요"
+    },
+    {
+      "minPercent": 60,
+      "text": "잘했어요"
+    },
+    {
+      "minPercent": 0,
+      "text": "힘내요"
+    }
+  ],
+  "poomsae": [
+    {
+      "id": "basic",
+      "name": "기본동작 연습",
+      "color": "#E8EAEE",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk1",
+      "name": "태극 1장",
+      "color": "#F2B705",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk2",
+      "name": "태극 2장",
+      "color": "#F2B705",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk3",
+      "name": "태극 3장",
+      "color": "#3FA34D",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk4",
+      "name": "태극 4장",
+      "color": "#3FA34D",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk5",
+      "name": "태극 5장",
+      "color": "#0F4C9C",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk6",
+      "name": "태극 6장",
+      "color": "#0F4C9C",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk7",
+      "name": "태극 7장",
+      "color": "#C8102E",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk8",
+      "name": "태극 8장",
+      "color": "#C8102E",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "koryo",
+      "name": "고려",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "keumgang",
+      "name": "금강",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taebaek",
+      "name": "태백",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "pyongwon",
+      "name": "평원",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "sipjin",
+      "name": "십진",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "jitae",
+      "name": "지태",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "chonkwon",
+      "name": "천권",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "hansu",
+      "name": "한수",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "ilyeo",
+      "name": "일여",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    }
+  ]
+}

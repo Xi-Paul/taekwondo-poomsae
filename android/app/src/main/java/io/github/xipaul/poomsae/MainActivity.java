@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.WindowInsets;
 import android.webkit.PermissionRequest;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -24,9 +25,11 @@ import android.widget.FrameLayout;
  */
 public class MainActivity extends Activity {
     private static final int REQ_CAMERA = 1;
+    private static final int REQ_FILE = 2;
 
     private WebView web;
     private PermissionRequest pendingCamera;
+    private ValueCallback<Uri[]> fileCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +108,22 @@ public class MainActivity extends Activity {
                     requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CAMERA);
                 }
             }
+
+            // <input type="file"> — WebView는 이걸 구현해야 파일 선택 창이 열린다 (품새 영상 올리기)
+            @Override
+            public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
+                if (fileCallback != null) fileCallback.onReceiveValue(null);
+                fileCallback = callback;
+                try {
+                    Intent pick = params.createIntent();
+                    pick.addCategory(Intent.CATEGORY_OPENABLE);
+                    startActivityForResult(Intent.createChooser(pick, "품새 영상 고르기"), REQ_FILE);
+                    return true;
+                } catch (Exception e) {
+                    fileCallback = null;
+                    return false;
+                }
+            }
         });
 
         if (savedInstanceState != null) {
@@ -128,18 +147,34 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != REQ_FILE || fileCallback == null) return;
+        fileCallback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+        fileCallback = null;
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         web.saveState(outState);
     }
 
+    // 뒤로 가기는 먼저 웹앱에 물어본다 (촬영 중이면 촬영 닫기, 다른 탭이면 첫 탭으로)
     @Override
     public void onBackPressed() {
-        if (web.canGoBack()) {
-            web.goBack();
-        } else {
+        if (web == null) {
             super.onBackPressed();
+            return;
         }
+        web.evaluateJavascript("(window.tkdBack && window.tkdBack()) ? '1' : '0'", result -> {
+            if ("\"1\"".equals(result)) return;
+            if (web != null && web.canGoBack()) {
+                web.goBack();
+            } else {
+                super.onBackPressed();
+            }
+        });
     }
 
     @Override
