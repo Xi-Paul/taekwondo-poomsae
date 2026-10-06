@@ -19,6 +19,7 @@ android {
         versionName = "1.0.${runNo}"
         buildConfigField 'String', 'APP_URL', '"https://xi-paul.github.io/taekwondo-poomsae/"'
         buildConfigField 'String', 'APP_HOST', '"xi-paul.github.io"'
+        buildConfigField 'String', 'GH_REPO', '"Xi-Paul/taekwondo-poomsae"'
     }
 
     buildFeatures {

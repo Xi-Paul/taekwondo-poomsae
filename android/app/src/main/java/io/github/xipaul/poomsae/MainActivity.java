@@ -30,6 +30,7 @@ public class MainActivity extends Activity {
     private WebView web;
     private PermissionRequest pendingCamera;
     private ValueCallback<Uri[]> fileCallback;
+    private Updater updater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +62,8 @@ public class MainActivity extends Activity {
         s.setAllowFileAccess(false);
         s.setAllowContentAccess(false);
 
-        web.addJavascriptInterface(new NativeBridge(this), "TkdNative");
+        updater = new Updater(this);
+        web.addJavascriptInterface(new NativeBridge(this, updater), "TkdNative");
 
         web.setWebViewClient(new WebViewClient() {
             // 우리 사이트 밖의 링크는 외부 브라우저로 — 브리지가 다른 사이트에 노출되지 않게
@@ -129,8 +131,21 @@ public class MainActivity extends Activity {
         if (savedInstanceState != null) {
             web.restoreState(savedInstanceState);
         } else {
-            web.loadUrl(BuildConfig.APP_URL);
+            // ?t= : 실행할 때마다 최신 index.html을 받도록 (WebView 캐시 때문에 웹 업데이트가 늦게 보이는 것 방지)
+            web.loadUrl(BuildConfig.APP_URL + "?t=" + System.currentTimeMillis());
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (updater != null) updater.resume(); // 새 APK 확인(1시간에 한 번) / 설치 허용 후 이어서 진행
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (updater != null) updater.onResult(intent);
     }
 
     @Override

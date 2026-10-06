@@ -303,6 +303,8 @@ textarea{width:100%;min-height:64px;background:var(--surface);border:1.5px solid
     <p class="hint">영상은 이 기기에만 저장되고 GitHub에는 올라가지 않아요. 다시 보기 화면의 "내보내기"로 사진첩이나 파일로 옮길 수 있어요.</p>
     <h2>앱 정보</h2>
     <p class="hint" id="appInfo"></p>
+    <div class="controls" id="updBox" hidden><button class="btn go" id="btnUpd">APK 업데이트 확인</button></div>
+    <p class="hint" id="updHint" hidden>앱을 열 때 1시간에 한 번씩 새 버전을 자동으로 확인해요. 화면·기능 변경은 업데이트 없이 바로 반영되고, APK 업데이트는 저장 기능 같은 앱 자체가 바뀔 때만 나와요.</p>
   </section>
 </main>
 
@@ -317,9 +319,11 @@ textarea{width:100%;min-height:64px;background:var(--surface);border:1.5px solid
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script type="module">
-import { frameFeatures, computeMetrics, compareToReference, starsFor, ANGLES, alignTimes, frameAt } from './js/metrics.js';
-import { VideoStore, canPickFolder, pickRecorderType, fileStamp } from './js/videostore.js';
-import { Store, loadSettings, saveSettings } from './js/store.js';
+// 실행할 때마다 최신 모듈을 받는다 (캐시 때문에 업데이트가 늦게 보이지 않게, 합계 수십 KB)
+const V = Date.now();
+const { frameFeatures, computeMetrics, compareToReference, starsFor, ANGLES, alignTimes, frameAt } = await import(`./js/metrics.js?v=${V}`);
+const { VideoStore, canPickFolder, pickRecorderType, fileStamp } = await import(`./js/videostore.js?v=${V}`);
+const { Store, loadSettings, saveSettings } = await import(`./js/store.js?v=${V}`);
 
 const MP_VER = '0.10.14';
 const MODEL_URL = (m) => `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_${m}/float16/1/pose_landmarker_${m}.task`;
@@ -1239,6 +1243,8 @@ function show(v) {
   if (v === 'settings') { fillSettings(); renderVideoSettings(); }
 }
 function fillSettings() {
+  const canUpd = typeof window.TkdNative?.checkUpdate === 'function';
+  $('updBox').hidden = !canUpd; $('updHint').hidden = !canUpd;
   const s = loadSettings();
   $('sOwner').value = s.owner || ''; $('sRepo').value = s.repo || ''; $('sBranch').value = s.branch || ''; $('sToken').value = s.token || '';
   $('sState').textContent = `지금 저장 위치: ${S.store.label}`;
@@ -1265,6 +1271,7 @@ $('dNote').oninput = () => { const e = (D.data.days[D.date] ??= { v: {} }); e.no
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushDaily(); });
 $('pSel').onchange = (e) => setPoomsae(e.target.value);
 $('rSel').onchange = () => { closeReplay(); renderRecords(); };
+$('btnUpd').onclick = () => { try { window.TkdNative.checkUpdate(); toast('새 버전을 확인하는 중…'); } catch (e) { toast(e.message); } };
 $('btnFolder').onclick = async () => {
   try { await S.vs.pickFolder(); toast(`앞으로 영상은 "${S.vs.folder.name}" 폴더에 저장돼요.`); }
   catch (e) { if (e.name !== 'AbortError') toast(`폴더를 쓸 수 없어요: ${e.message}`); }

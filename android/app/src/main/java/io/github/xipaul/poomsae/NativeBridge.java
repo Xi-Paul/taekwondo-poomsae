@@ -40,14 +40,16 @@ public class NativeBridge {
     private static final String ROOT = "품새연습장";
 
     private final Activity act;
+    private final Updater updater;
     private final ContentResolver cr;
     private final Map<Integer, OutputStream> outs = new HashMap<>();
     private final Map<Integer, Uri> outUris = new HashMap<>();
     private final Map<Integer, InputStream> ins = new HashMap<>();
     private int nextId = 1;
 
-    NativeBridge(Activity act) {
+    NativeBridge(Activity act, Updater updater) {
         this.act = act;
+        this.updater = updater;
         this.cr = act.getContentResolver();
     }
 
@@ -103,6 +105,12 @@ public class NativeBridge {
     @JavascriptInterface
     public String version() {
         return BuildConfig.VERSION_NAME;
+    }
+
+    /** 설정 화면 "업데이트 확인" */
+    @JavascriptInterface
+    public void checkUpdate() {
+        updater.check(true);
     }
 
     @JavascriptInterface
