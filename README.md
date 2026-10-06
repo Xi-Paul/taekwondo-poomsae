@@ -3,11 +3,18 @@
 스마트폰 카메라로 품새를 찍어 관절 각도를 재고, 초등학생이 이해할 수 있는 별점·한 줄 조언으로 바꿔 주는 웹앱입니다.
 서버 없이 GitHub Pages로 배포하고, 기록은 GitHub REST API로 데이터 저장소에 JSON으로 쌓습니다.
 
+## 품새 목록
+
+`config/catalog.json`이 기본 품새 목록이다 (기본동작, 태극 1~8장, 유단자 9개, 경기용 새 품새 4개 = 22개). 이 파일은 워크플로의 설정 보호 대상이 아니라 **zip 업로드만으로 갱신**된다.
+
+`config/poomsae.json`의 `poomsae`는 사용자 조정용이다. 같은 `id`가 있으면 그 값이 catalog보다 우선하고(예: 특정 품새의 `metrics`에서 `kick` 빼기), catalog에 없는 `id`는 목록 끝에 추가된다.
+
 ## 파일 구조
 
 | 파일 | 역할 | 수정 빈도 |
 |---|---|---|
-| `config/poomsae.json` | 아이 이름, 품새 목록, 별점 기준값, 조언 문구 | 자주 (업데이트 지점) |
+| `config/poomsae.json` | 아이 이름, 별점 기준값, 조언 문구, 품새별 조정 | 자주 (업데이트 지점) |
+| `config/catalog.json` | 기본 품새 목록 (zip으로 갱신) | 품새 추가 시 |
 | `js/metrics.js` | 지표 계산 (관절각, DTW 비교) | 계산 방식을 바꿀 때만 |
 | `js/store.js` | GitHub 저장/불러오기 | 거의 없음 |
 | `js/videostore.js` | 리플레이 영상 저장 (기기 안 / APK 네이티브) | 거의 없음 |

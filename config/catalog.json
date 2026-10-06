@@ -1,0 +1,270 @@
+{
+  "version": "2026.10.04",
+  "note": "품새 기본 목록. 설정(config/poomsae.json)의 poomsae에 같은 id가 있으면 그 값이 우선하고, 없는 id는 뒤에 추가됨.",
+  "poomsae": [
+    {
+      "id": "basic",
+      "name": "기본동작 연습",
+      "group": "기본",
+      "color": "#E8EAEE",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk1",
+      "name": "태극 1장",
+      "group": "유급자 (태극)",
+      "color": "#F2B705",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk2",
+      "name": "태극 2장",
+      "group": "유급자 (태극)",
+      "color": "#F2B705",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk3",
+      "name": "태극 3장",
+      "group": "유급자 (태극)",
+      "color": "#3FA34D",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk4",
+      "name": "태극 4장",
+      "group": "유급자 (태극)",
+      "color": "#3FA34D",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk5",
+      "name": "태극 5장",
+      "group": "유급자 (태극)",
+      "color": "#0F4C9C",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk6",
+      "name": "태극 6장",
+      "group": "유급자 (태극)",
+      "color": "#0F4C9C",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk7",
+      "name": "태극 7장",
+      "group": "유급자 (태극)",
+      "color": "#C8102E",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taegeuk8",
+      "name": "태극 8장",
+      "group": "유급자 (태극)",
+      "color": "#C8102E",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "koryo",
+      "name": "고려",
+      "group": "유단자 (국기원 공인)",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "keumgang",
+      "name": "금강",
+      "group": "유단자 (국기원 공인)",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "taebaek",
+      "name": "태백",
+      "group": "유단자 (국기원 공인)",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "pyongwon",
+      "name": "평원",
+      "group": "유단자 (국기원 공인)",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "sipjin",
+      "name": "십진",
+      "group": "유단자 (국기원 공인)",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "jitae",
+      "name": "지태",
+      "group": "유단자 (국기원 공인)",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "chonkwon",
+      "name": "천권",
+      "group": "유단자 (국기원 공인)",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "hansu",
+      "name": "한수",
+      "group": "유단자 (국기원 공인)",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "ilyeo",
+      "name": "일여",
+      "group": "유단자 (국기원 공인)",
+      "color": "#111111",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "bigak",
+      "name": "비각",
+      "group": "경기용 새 품새",
+      "color": "#6B3FA0",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "narsha",
+      "name": "나르샤",
+      "group": "경기용 새 품새",
+      "color": "#6B3FA0",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "himchari",
+      "name": "힘차리",
+      "group": "경기용 새 품새",
+      "color": "#6B3FA0",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    },
+    {
+      "id": "saebyeol",
+      "name": "새별",
+      "group": "경기용 새 품새",
+      "color": "#6B3FA0",
+      "metrics": [
+        "stance",
+        "punch",
+        "kick",
+        "posture"
+      ]
+    }
+  ]
+}

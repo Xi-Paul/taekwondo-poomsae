@@ -343,10 +343,25 @@ const P = () => S.cfg.poomsae.find((p) => p.id === S.pid);
 const childName = () => S.cfg.children.find((c) => c.id === S.child)?.name ?? '';
 
 // ---------- 설정 파일 (업데이트 지점) ----------
+// 품새 목록 = catalog.json(기본 목록, zip 업로드로 갱신) + poomsae.json(사용자 설정, 같은 id면 우선)
+function mergePoomsae(catalog, own) {
+  const ownById = new Map((own || []).map((p) => [p.id, p]));
+  const out = (catalog || []).map((p) => ({ ...p, ...(ownById.get(p.id) || {}) }));
+  const seen = new Set(out.map((p) => p.id));
+  for (const p of own || []) if (!seen.has(p.id)) out.push(p);
+  return out;
+}
 async function loadConfig() {
-  const r = await fetch(`config/poomsae.json?v=${Date.now()}`, { cache: 'no-store' });
+  const t = Date.now();
+  const [r, rc] = await Promise.all([
+    fetch(`config/poomsae.json?v=${t}`, { cache: 'no-store' }),
+    fetch(`config/catalog.json?v=${t}`, { cache: 'no-store' }).catch(() => null),
+  ]);
   if (!r.ok) throw new Error('config/poomsae.json 을 읽지 못했어요.');
   S.cfg = await r.json();
+  try {
+    if (rc?.ok) { const cat = await rc.json(); S.cfg.poomsae = mergePoomsae(cat.poomsae, S.cfg.poomsae); S.cfg.catalogVersion = cat.version; }
+  } catch {}
 }
 
 function renderKids() {
@@ -360,7 +375,15 @@ function renderKids() {
   });
 }
 function renderPoomsaeSelects() {
-  const opts = S.cfg.poomsae.map((p) => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+  // group(유급자/유단자/새 품새)별로 묶어서 표시
+  const groups = [];
+  for (const p of S.cfg.poomsae) {
+    const g = p.group || '';
+    let grp = groups.find((x) => x.g === g);
+    if (!grp) groups.push((grp = { g, items: [] }));
+    grp.items.push(`<option value="${esc(p.id)}">${esc(p.name)}</option>`);
+  }
+  const opts = groups.map((x) => (x.g ? `<optgroup label="${esc(x.g)}">${x.items.join('')}</optgroup>` : x.items.join(''))).join('');
   $('pSel').innerHTML = opts; $('rSel').innerHTML = opts;
   $('pSel').value = S.pid; $('rSel').value = S.pid;
   document.documentElement.style.setProperty('--pcolor', P()?.color || '#F2B705');
@@ -1250,7 +1273,7 @@ function fillSettings() {
   $('sState').textContent = `지금 저장 위치: ${S.store.label}`;
   let apk = '';
   try { if (window.TkdNative) apk = `APK ${window.TkdNative.version()} · `; } catch {}
-  $('appInfo').textContent = `${apk}설정 파일 버전 ${S.cfg.version} · 동작 인식 MediaPipe Pose Landmarker ${MP_VER} (${S.cfg.capture.model}) · 초당 ${S.cfg.capture.sampleHz}회 기록`;
+  $('appInfo').textContent = `${apk}설정 파일 버전 ${S.cfg.version}${S.cfg.catalogVersion ? ` · 품새 목록 ${S.cfg.catalogVersion} (${S.cfg.poomsae.length}개)` : ''} · 동작 인식 MediaPipe Pose Landmarker ${MP_VER} (${S.cfg.capture.model}) · 초당 ${S.cfg.capture.sampleHz}회 기록`;
 }
 function setMode(m) {
   S.mode = m;
