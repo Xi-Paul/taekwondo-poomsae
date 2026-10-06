@@ -187,6 +187,20 @@ textarea{width:100%;min-height:64px;background:var(--surface);border:1.5px solid
 .vlist button{min-height:40px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;padding:0 10px}
 .quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 .quick .btn{font-size:1rem;min-height:44px;padding:8px 14px}
+/* 한 달 정리 */
+.mo-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.mo-cards div{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:10px 12px}
+.mo-cards b{display:block;font:400 1.9rem/1.1 var(--display);color:var(--red)}
+.mo-cards small{color:var(--sub)}
+.mo-tab{width:100%;border-collapse:collapse;font-size:.93rem;background:var(--surface);border-radius:12px;overflow:hidden}
+.mo-tab th,.mo-tab td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right}
+.mo-tab th:first-child,.mo-tab td:first-child{text-align:left}
+.mo-tab th{color:var(--sub);font-weight:500;font-size:.82rem}
+.mo-p{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:12px;margin-top:8px}
+.mo-p .up{color:var(--ok)} .mo-p .down{color:var(--red)}
+.mo-notes{list-style:none;padding:0;margin:0}
+.mo-notes li{padding:8px 2px;border-bottom:1px solid var(--line)}
+.mo-notes small{color:var(--sub);margin-right:6px}
 [hidden]{display:none!important}
 
 .toast{z-index:40!important;position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;max-width:90vw;z-index:9;font-size:.95rem}
@@ -240,12 +254,12 @@ textarea{width:100%;min-height:64px;background:var(--surface);border:1.5px solid
     <div class="seg" role="group" aria-label="모드">
       <button id="mPractice" aria-pressed="true">연습하기</button>
       <button id="mRef" aria-pressed="false">기준 동작 저장 (어른)</button>
-      <button id="mModel" aria-pressed="false">모범 영상</button>
+      <button id="mModel" aria-pressed="false">비교 영상</button>
     </div>
     <div id="modelBox" hidden>
-      <div class="field"><label for="mLabel">모범 영상 이름</label>
-        <input type="text" id="mLabel" maxlength="40" placeholder="예: 사범님, ○○ 선수 2026 대회"></div>
-      <p class="hint">별점에는 쓰이지 않고, 연습 결과와 다시 보기에서 "모범과 비교"로만 보여요. 고정된 카메라로 같은 품새를 처음부터 끝까지 찍은 영상이 좋아요. 직접 찍었거나 사용 허락을 받은 영상만 올려 주세요.</p>
+      <div class="field"><label for="mLabel">누구 영상인가요?</label>
+        <input type="text" id="mLabel" maxlength="40" placeholder="예: 사범님, 형, 친구, ○○ 선수 2026 대회"></div>
+      <p class="hint">별점에는 쓰이지 않고, 연습 결과와 다시 보기에서 비교용으로만 보여요. 사범님이 아닌 형·친구·선수 영상도 이름을 붙여 여러 개 저장할 수 있어요. 고정된 카메라로 같은 품새를 처음부터 끝까지 찍은 영상이 좋아요. 직접 찍었거나 사용 허락을 받은 영상만 올려 주세요.</p>
       <div id="modelList"></div>
     </div>
 
@@ -281,7 +295,21 @@ textarea{width:100%;min-height:64px;background:var(--surface);border:1.5px solid
     <div id="recBody"></div>
     <h2>다시 보기</h2>
     <div id="player"></div>
+    <div class="field"><label for="cmpLabel">다른 사람 영상과 비교하기</label>
+      <div class="row"><input type="text" id="cmpLabel" maxlength="40" placeholder="누구 영상인가요? (예: 형, 친구, ○○ 선수)" style="flex:1;min-width:0">
+      <button class="btn go" id="btnCmpUp" style="min-height:44px;font-size:1rem">영상 올리기</button></div></div>
+    <p class="hint">올린 영상을 분석해 위에서 고른 품새의 비교 영상으로 저장하고, 아이의 최근 영상과 같은 동작 위치로 나란히 보여 줘요.</p>
     <div id="replayList"></div>
+  </section>
+
+  <!-- 한 달 정리 -->
+  <section id="v-month" hidden>
+    <div class="daynav">
+      <button class="btn" id="moPrev" aria-label="지난달">‹</button>
+      <div class="date" id="moTitle"></div>
+      <button class="btn" id="moNext" aria-label="다음달">›</button>
+    </div>
+    <div id="moBody"></div>
   </section>
 
   <!-- 설정 -->
@@ -310,9 +338,10 @@ textarea{width:100%;min-height:64px;background:var(--surface);border:1.5px solid
 
 <nav class="tabs" role="tablist">
   <div class="wrap">
-    <button role="tab" data-v="daily" aria-selected="true">오늘 운동</button>
+    <button role="tab" data-v="daily" aria-selected="true">오늘</button>
     <button role="tab" data-v="practice" aria-selected="false">품새</button>
-    <button role="tab" data-v="records" aria-selected="false">품새 기록</button>
+    <button role="tab" data-v="records" aria-selected="false">기록</button>
+    <button role="tab" data-v="month" aria-selected="false">한 달</button>
     <button role="tab" data-v="settings" aria-selected="false">설정</button>
   </div>
 </nav>
@@ -324,6 +353,7 @@ const V = Date.now();
 const { frameFeatures, computeMetrics, compareToReference, starsFor, ANGLES, alignTimes, frameAt } = await import(`./js/metrics.js?v=${V}`);
 const { VideoStore, canPickFolder, pickRecorderType, fileStamp } = await import(`./js/videostore.js?v=${V}`);
 const { Store, loadSettings, saveSettings } = await import(`./js/store.js?v=${V}`);
+const { computeMonth, summaryText, comparePrev, shiftMonth: moShift, monthKey } = await import(`./js/report.js?v=${V}`);
 
 const MP_VER = '0.10.14';
 const MODEL_URL = (m) => `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_${m}/float16/1/pose_landmarker_${m}.task`;
@@ -372,6 +402,7 @@ function renderKids() {
     closeReplay();
     if (!$('v-records').hidden) renderRecords();
     if (!$('v-daily').hidden) loadDaily();
+    if (!$('v-month').hidden) renderMonth();
   });
 }
 function renderPoomsaeSelects() {
@@ -645,7 +676,9 @@ async function finish(frames, blobP, opts = {}) {
   const seq = frames.filter((f) => f.ok).map((f) => ({ t: f.t, a: f.a.map((x) => Math.round(x)) }));
   if (S.mode === 'model') {
     const { id, label } = await saveModel(seq, m, at);
-    return saveVideo('model', id, frames, m, null, blobP, at, opts.facing, { label });
+    await saveVideo('model', id, frames, m, null, blobP, at, opts.facing, { label });
+    if (S.afterModel) { S.afterModel = false; await openAfterUpload(id); }
+    return;
   }
   if (S.mode === 'ref') {
     await saveReference(seq, m);
@@ -755,18 +788,18 @@ async function getModels(pid, force = false) {
 const modelLabel = () => $('mLabel').value.trim();
 function needLabel() {
   if (S.mode !== 'model' || modelLabel()) return false;
-  toast('모범 영상 이름을 먼저 적어 주세요.'); $('mLabel').focus(); return true;
+  toast('누구 영상인지 이름을 먼저 적어 주세요.'); $('mLabel').focus(); return true;
 }
 async function saveModel(seq, m, at) {
   const label = modelLabel(), id = Date.now().toString(36);
   const entry = { id, label, savedAt: at.toISOString(), duration: m.duration, values: m.values, cfgVersion: S.cfg.version, seq };
-  $('result').innerHTML = `<div class="result"><p class="result-title">모범 영상 "${esc(label)}" (${esc(P().name)}, ${m.duration}초)</p>
+  $('result').innerHTML = `<div class="result"><p class="result-title">비교 영상 "${esc(label)}" (${esc(P().name)}, ${m.duration}초)</p>
     <p class="hint">${P().metrics.map((k) => `${esc(S.cfg.metrics[k].label)} ${fmt(m.values[k], S.cfg.metrics[k].unit)}`).join(' · ')}</p>
     <p class="hint" id="saveState">저장 중…</p><p class="hint" id="vidState"></p></div>`;
   try {
-    await S.store.update(`models/${S.pid}.json`, (d) => { d.models.push(entry); return d; }, { models: [] }, `모범 영상: ${P().name} ${label}`);
+    await S.store.update(`models/${S.pid}.json`, (d) => { d.models.push(entry); return d; }, { models: [] }, `비교 영상: ${P().name} ${label}`);
     delete S.models[S.pid];
-    $('saveState').textContent = `${S.store.label}에 저장했어요. 이제 연습 결과에 "모범과 비교"가 나와요.`;
+    $('saveState').textContent = `${S.store.label}에 저장했어요. 이제 연습 결과와 다시 보기에서 "${label}" 영상과 비교할 수 있어요.`;
     renderModelList();
   } catch (e) { $('saveState').textContent = `저장 실패: ${e.message}`; }
   return { id, label };
@@ -774,14 +807,14 @@ async function saveModel(seq, m, at) {
 async function renderModelList() {
   const ms = await getModels(S.pid);
   $('modelList').innerHTML = ms.length
-    ? `<p class="hint" style="margin-bottom:0">${esc(P().name)}에 저장된 모범 영상</p><ul class="mlist">${ms.map((x) =>
+    ? `<p class="hint" style="margin-bottom:0">${esc(P().name)}에 저장된 비교 영상</p><ul class="mlist">${ms.map((x) =>
         `<li><span>${esc(x.label)} <small class="hint">${new Date(x.savedAt).toLocaleDateString('ko-KR')} · ${x.duration}초</small></span><button data-mdel="${esc(x.id)}">삭제</button></li>`).join('')}</ul>`
-    : `<p class="hint">${esc(P().name)}에는 아직 모범 영상이 없어요.</p>`;
+    : `<p class="hint">${esc(P().name)}에는 아직 비교 영상이 없어요.</p>`;
   $('modelList').querySelectorAll('[data-mdel]').forEach((b) => (b.onclick = async () => {
     const x = ms.find((y) => y.id === b.dataset.mdel);
-    if (!confirm(`모범 영상 "${x.label}"을 지울까요? 비교 데이터와 이 기기의 영상이 함께 지워져요.`)) return;
+    if (!confirm(`비교 영상 "${x.label}"을 지울까요? 비교 데이터와 이 기기의 영상이 함께 지워져요.`)) return;
     try {
-      await S.store.update(`models/${S.pid}.json`, (d) => { d.models = d.models.filter((y) => y.id !== x.id); return d; }, { models: [] }, `모범 영상 삭제: ${x.label}`);
+      await S.store.update(`models/${S.pid}.json`, (d) => { d.models = d.models.filter((y) => y.id !== x.id); return d; }, { models: [] }, `비교 영상 삭제: ${x.label}`);
       const clip = ((await S.vs.list('model', S.pid)) || []).find((c) => c.meta.id === x.id);
       if (clip) await S.vs.remove(clip.base, clip.meta.ext);
       delete S.models[S.pid]; renderModelList();
@@ -789,29 +822,29 @@ async function renderModelList() {
   }));
 }
 // 모범 대비 표현: 크기가 의미 있는 값은 %, 각도 차이가 의미 있는 값은 °
-function vsModel(k, v, mv) {
+function vsModel(k, v, mv, who) {
   if (!Number.isFinite(v) || !Number.isFinite(mv)) return '—';
-  if (k === 'stance') { const a = 180 - v, b = 180 - mv; return b > 0 ? `무릎 굽힘이 모범의 ${Math.round((a / b) * 100)}%` : '—'; }
-  if (k === 'kick') return mv > 0 ? `발차기 높이가 모범의 ${Math.round((v / mv) * 100)}%` : '—';
+  if (k === 'stance') { const a = 180 - v, b = 180 - mv; return b > 0 ? `무릎 굽힘이 ${who}의 ${Math.round((a / b) * 100)}%` : '—'; }
+  if (k === 'kick') return mv > 0 ? `발차기 높이가 ${who}의 ${Math.round((v / mv) * 100)}%` : '—';
   const d = Math.round(v - mv), better = S.cfg.metrics[k]?.better;
-  if (better === 'higher') return d >= 0 ? '모범만큼 했어요' : `모범보다 ${-d}° 모자라요`;
-  return d <= 0 ? '모범만큼 했어요' : `모범보다 ${d}° 더 커요`;
+  if (better === 'higher') return d >= 0 ? `${who}만큼 했어요` : `${who}보다 ${-d}° 모자라요`;
+  return d <= 0 ? `${who}만큼 했어요` : `${who}보다 ${d}° 더 커요`;
 }
 async function renderModelCompare(values, seq) {
   const box = $('modelCmp'); if (!box) return;
   const ms = await getModels(S.pid);
-  if (!ms.length) { box.innerHTML = `<p class="hint">모범 영상을 추가하면 여기에 모범과 비교가 나와요 (별점과는 별개).</p>`; return; }
+  if (!ms.length) { box.innerHTML = `<p class="hint">비교 영상(사범님·형·친구·선수 등)을 추가하면 여기에 나란히 비교가 나와요 (별점과는 별개).</p>`; return; }
   const pick = localStorage.getItem(`tkd:model:${S.pid}`);
   const cur = ms.find((x) => x.id === pick) || ms.at(-1);
-  const sel = ms.length > 1 ? `<select id="mPick" aria-label="비교할 모범 영상">${ms.map((x) => `<option value="${esc(x.id)}" ${x === cur ? 'selected' : ''}>${esc(x.label)}</option>`).join('')}</select>` : `<b>${esc(cur.label)}</b>`;
+  const sel = ms.length > 1 ? `<select id="mPick" aria-label="비교할 영상">${ms.map((x) => `<option value="${esc(x.id)}" ${x === cur ? 'selected' : ''}>${esc(x.label)}</option>`).join('')}</select>` : `<b>${esc(cur.label)}</b>`;
   const rows = P().metrics.map((k) => {
     const d = S.cfg.metrics[k];
-    return `<tr><td>${esc(d.label)}</td><td class="n">${fmt(values[k], d.unit)} / ${fmt(cur.values?.[k], d.unit)}</td><td>${esc(vsModel(k, values[k], cur.values?.[k]))}</td></tr>`;
+    return `<tr><td>${esc(d.label)}</td><td class="n">${fmt(values[k], d.unit)} / ${fmt(cur.values?.[k], d.unit)}</td><td>${esc(vsModel(k, values[k], cur.values?.[k], cur.label))}</td></tr>`;
   }).join('');
   const dtw = cur.seq?.length ? compareToReference(seq, cur.seq) : null;
   const flow = dtw ? `<p class="hint">동작 흐름: 관절 각도 차이 평균 ${dtw.meanErr}° · 가장 다른 곳 ${Math.round(dtw.worstAtSec)}초쯤 ${esc(dtw.worstJointName)} · 빠르기 비 ${dtw.tempo}</p>` : '';
-  box.innerHTML = `<h2 style="margin:18px 0 4px">모범과 비교</h2><div class="row">${sel}</div>
-    <table class="mcmp"><tr><th></th><th class="n">나 / 모범</th><th></th></tr>${rows}</table>${flow}`;
+  box.innerHTML = `<h2 style="margin:18px 0 4px">다른 영상과 비교</h2><div class="row">${sel}</div>
+    <table class="mcmp"><tr><th></th><th class="n">나 / ${esc(cur.label)}</th><th></th></tr>${rows}</table>${flow}`;
   $('mPick')?.addEventListener('change', (e) => { localStorage.setItem(`tkd:model:${S.pid}`, e.target.value); renderModelCompare(values, seq); });
 }
 
@@ -852,12 +885,25 @@ async function renderRecords() {
     <p class="hint">점수 = 받은 별 ÷ 받을 수 있는 별 × 100, 최근 ${last.length}회</p><ul class="rec-list">${list}</ul>`;
 }
 
+// 다시 보기에서 올린 비교 영상: 저장이 끝나면 기록 탭으로 돌아가 아이 최근 영상과 나란히 연다
+async function openAfterUpload(id) {
+  const pid = S.pid;
+  show('records'); $('rSel').value = pid;
+  const [mine, models] = await Promise.all([S.vs.list(S.child, pid), S.vs.list('model', pid)]);
+  const mc = (models || []).find((x) => x.meta.id === id);
+  if (!mc) { toast('영상이 저장되지 않아 나란히 볼 수 없어요. 비교 수치는 연습 결과에 나와요.'); return; }
+  localStorage.setItem(`tkd:model:${pid}`, id);
+  const last = (mine || []).at(-1);
+  await openReplay(last || mc, last ? mc : undefined);
+  if (!last) toast(`${childName()}의 이 품새 영상이 아직 없어서 올린 영상만 보여요.`);
+}
+
 // ---------- 다시 보기 ----------
 const R = { list: [], a: null, b: null, map: null, raf: 0, skel: true, mirror: true, rate: 1, pick: new Set() };
 const fmtT = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 const clipName = (it) => {
   if (it.meta.kind === 'ref') return '사범님 기준';
-  if (it.meta.kind === 'model') return `모범: ${it.meta.label || ''}`;
+  if (it.meta.kind === 'model') return `비교: ${it.meta.label || ''}`;
   const d = new Date(it.meta.at), p = (n) => String(n).padStart(2, '0');
   return `${d.getMonth() + 1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`;
 };
@@ -882,7 +928,7 @@ async function renderReplayList() {
   const q = [];
   if (mine.length >= 2) q.push(`<button class="btn" data-q="firstlast">처음 vs 최근</button>`);
   if (mine.length && refs.length) q.push(`<button class="btn" data-q="ref">최근 vs 사범님</button>`);
-  if (mine.length && models.length) q.push(`<button class="btn" data-q="model">최근 vs 모범</button>`);
+  if (mine.length && models.length) q.push(`<button class="btn" data-q="model">최근 vs 비교 영상</button>`);
   q.push(`<button class="btn go" id="btnCmp" disabled>고른 2개 비교</button>`);
   const rows = R.list.slice().reverse().map((it) => {
     const i = R.list.indexOf(it);
@@ -914,7 +960,7 @@ async function renderReplayList() {
 async function exportClip(it) {
   try {
     const blob = S.vs.kind === 'native' ? null : await S.vs.video(it.base, it.meta.ext);
-    const who = it.meta.kind === 'ref' ? '사범님' : it.meta.kind === 'model' ? `모범_${it.meta.label || ''}` : it.meta.childName;
+    const who = it.meta.kind === 'ref' ? '사범님' : it.meta.kind === 'model' ? `비교_${it.meta.label || ''}` : it.meta.childName;
     const name = `${who}_${it.meta.pname}_${fileStamp(new Date(it.meta.at))}.${it.meta.ext}`.replace(/\s/g, '');
     if (S.vs.kind === 'native') { S.vs.shareNative(it.base, it.meta.ext, name); return; }
     const file = new File([blob], name, { type: blob.type || it.meta.mime });
@@ -1254,10 +1300,105 @@ function renderCalendar() {
 }
 function shiftMonth(n) { const [y, m] = D.month.split('-').map(Number); D.month = dayKey(new Date(y, m - 1 + n, 1)).slice(0, 7); renderCalendar(); }
 
+// ---------- 한 달 정리 ----------
+let MO = monthKey(new Date());
+const nf = (n) => Number(n).toLocaleString('ko-KR');
+async function renderMonth() {
+  const body = $('moBody'), t = today(), cur = t.slice(0, 7);
+  const [y, m] = MO.split('-').map(Number);
+  $('moNext').disabled = MO >= cur;
+  body.innerHTML = '<p class="hint">불러오는 중…</p>';
+  await flushDaily();
+  await loadDaily(); // 이 아이의 운동·품새 기록을 최신으로
+  const ctx = { days: D.data.days, recs: D.recs, items: dItems(), metrics: S.cfg.metrics, todayKey: t,
+                poomsaeName: (id) => S.cfg.poomsae.find((p) => p.id === id)?.name ?? id };
+  const rep = computeMonth(MO, ctx), prev = computeMonth(moShift(MO, -1), ctx), cp = comparePrev(rep, prev);
+  $('moTitle').textContent = `${y}년 ${m}월${rep.inProgress ? ` · ${rep.elapsed}일째` : ''}`;
+  if (rep.future) { body.innerHTML = '<p class="hint">아직 오지 않은 달이에요.</p>'; return; }
+
+  // 날짜별 막대: 높이 = 그날 필수 목표 중 채운 비율, 빨강 = 모두 달성, 노랑 = 일부, 점 = 품새 연습
+  const W = 640, H = 170, pad = 24, bw = (W - pad * 2) / rep.nDays;
+  const bars = rep.daily.map((d, i) => {
+    const x = pad + i * bw + 1, w = Math.max(2, bw - 2);
+    if (d.future) return '';
+    const r = d.required ? d.done / d.required : d.active ? 1 : 0, h = Math.max(d.active ? 6 : 2, r * (H - 50));
+    const col = d.full ? 'var(--red)' : d.active ? 'var(--gold)' : 'var(--line)';
+    return `<rect x="${x.toFixed(1)}" y="${(H - 26 - h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${col}"/>`
+      + (d.poomsae ? `<circle cx="${(x + w / 2).toFixed(1)}" cy="${(H - 26 - h - 8).toFixed(1)}" r="4" fill="var(--blue)"/>` : '');
+  }).join('');
+  const ticks = [1, 8, 15, 22, rep.nDays].map((d) => `<text x="${(pad + (d - 0.5) * bw).toFixed(1)}" y="${H - 6}" font-size="16" text-anchor="middle" fill="var(--sub)">${d}</text>`).join('');
+
+  const itemRows = rep.items.map((s) => `<tr><td>${esc(s.name)}${s.optional ? ' <small class="hint">(선택)</small>' : ''}</td><td>${s.doneDays}일</td>
+    <td>${s.type === 'check' ? '—' : `${nf(s.total)}${esc(s.unit)}<br><small class="hint">하루 ${s.perDay ?? 0}${esc(s.unit)}</small>`}</td>
+    <td>${s.optional ? '—' : `${s.goalDays}일`}</td></tr>`).join('');
+
+  const pRows = rep.poomsae.map((p) => {
+    const ch = p.change.map((c) => {
+      const fmtv = (v) => (c.unit === '°' ? `${Math.round(v)}°` : v.toFixed(2));
+      const cls = c.same ? '' : c.improved ? 'up' : 'down';
+      return `<li>${esc(c.label)}: ${fmtv(c.from)} → ${fmtv(c.to)} <span class="${cls}">${c.same ? '그대로' : c.improved ? '좋아졌어요' : '조금 내려갔어요'}</span></li>`;
+    }).join('');
+    const d = p.lastScore - p.firstScore;
+    return `<div class="mo-p"><b>${esc(p.name)}</b> · ${p.count}회 · 평균 ${p.avgScore}점
+      ${p.count < 2 ? '' : `<p style="margin:4px 0">점수 ${p.firstScore}점 → ${p.lastScore}점 <span class="${d > 0 ? 'up' : d < 0 ? 'down' : ''}">(${d >= 0 ? '+' : ''}${d})</span> <small class="hint">${esc(p.basis)}</small></p>`}
+      ${ch ? `<ul style="margin:4px 0;padding-left:18px">${ch}</ul>` : ''}</div>`;
+  }).join('');
+
+  const notes = rep.notes.map((n) => `<li><small>${Number(n.key.slice(8))}일</small>${esc(n.note)}</li>`).join('');
+  const cheer = cp ? (cp.delta > 0 ? `${cp.basis}보다 ${cp.delta}일 더 운동했어요!` : cp.delta === 0 ? `${cp.basis}와 똑같이 운동했어요.` : `${cp.basis}보다 ${-cp.delta}일 적어요. 다음 달엔 조금 더 해 봐요!`) : '';
+
+  body.innerHTML = `
+    <div class="mo-cards">
+      <div><b>${rep.activeDays}일</b><small>운동한 날 / ${rep.elapsed}일 (${rep.activeRate}%)</small></div>
+      <div><b>${rep.fullDays}일</b><small>목표 모두 달성</small></div>
+      <div><b>${rep.bestStreak}일</b><small>최장 연속</small></div>
+      <div><b>${rep.poomsaeCount}회</b><small>품새 연습${rep.poomsaeAvg != null ? ` · 평균 ${rep.poomsaeAvg}점` : ''}</small></div>
+    </div>
+    ${cheer ? `<p>${esc(cheer)}</p>` : ''}
+    <h2>날짜별</h2>
+    <svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${m}월 날짜별 운동">${bars}${ticks}</svg>
+    <p class="hint">막대 높이 = 그날 목표 중 채운 비율 · 빨강 = 모두 달성 · 노랑 = 일부 · 파란 점 = 품새 연습</p>
+    <h2>운동별</h2>
+    ${rep.items.length ? `<table class="mo-tab"><tr><th>운동</th><th>한 날</th><th>합계</th><th>목표 달성</th></tr>${itemRows}</table>` : '<p class="hint">기록이 없어요.</p>'}
+    <h2>품새</h2>
+    ${pRows || '<p class="hint">이달 품새 연습 기록이 없어요.</p>'}
+    ${notes ? `<h2>메모</h2><ul class="mo-notes">${notes}</ul>` : ''}
+    <div class="controls"><button class="btn go" id="moShare">요약 복사·공유</button></div>
+    <p class="hint" id="moArch"></p>`;
+  $('moShare').onclick = () => shareText(summaryText(rep, prev, childName()));
+  archiveMonth(rep);
+}
+
+// 지난 달은 월말 정리를 GitHub에 한 번 보관 (reports/{아이}/{YYYY-MM}.json) — 나중에 운동 목록을 바꿔도 그달 기록이 남도록
+async function archiveMonth(rep) {
+  const el = $('moArch');
+  if (rep.inProgress) { el.textContent = '이번 달은 진행 중이에요. 달이 끝나고 이 화면을 열면 월말 정리가 보관돼요.'; return; }
+  const path = `reports/${S.child}/${rep.month}.json`;
+  try {
+    const ex = await S.store.read(path);
+    if (ex) { el.textContent = `월말 정리 보관됨 (${new Date(ex.data.savedAt).toLocaleDateString('ko-KR')}, ${S.store.label})`; return; }
+    const { daily, ...summary } = rep;
+    await S.store.write(path, { savedAt: new Date().toISOString(), child: S.child, childName: childName(), ...summary,
+      days: daily.map((d) => ({ key: d.key, active: d.active, full: d.full, done: d.done, required: d.required, poomsae: d.poomsae })) },
+      null, `월말 정리: ${childName()} ${rep.month}`);
+    el.textContent = `월말 정리를 ${S.store.label}에 보관했어요.`;
+  } catch (e) { el.textContent = `월말 정리 보관 실패: ${e.message}`; }
+}
+
+async function shareText(text) {
+  try { if (navigator.share) { await navigator.share({ text }); return; } } catch (e) { if (e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(text); toast('요약을 복사했어요. 카톡 등에 붙여 넣으세요.'); return; } catch {}
+  const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); toast('요약을 복사했어요. 카톡 등에 붙여 넣으세요.'); } catch { toast('복사하지 못했어요.'); }
+  ta.remove();
+}
+
 // ---------- 화면 전환 / 이벤트 ----------
 function show(v) {
   document.querySelectorAll('nav.tabs button').forEach((b) => b.setAttribute('aria-selected', b.dataset.v === v));
-  ['daily', 'practice', 'records', 'settings'].forEach((k) => ($(`v-${k}`).hidden = k !== v));
+  ['daily', 'practice', 'records', 'month', 'settings'].forEach((k) => ($(`v-${k}`).hidden = k !== v));
+  if (v === 'month') renderMonth();
   if (v !== 'daily') flushDaily();
   if (v === 'daily') loadDaily();
   if (v !== 'practice') { if (S.rec === 'file') uplCancel = true; else if (S.rec !== 'idle') stopRecording(true); stopCamera(); exitShoot(); }
@@ -1288,6 +1429,8 @@ document.querySelectorAll('nav.tabs button').forEach((b) => (b.onclick = () => s
 $('dPrev').onclick = () => { D.date = addDays(D.date, -1); D.month = D.date.slice(0, 7); renderDaily(); };
 $('dNext').onclick = () => { if (D.date < today()) { D.date = addDays(D.date, 1); D.month = D.date.slice(0, 7); renderDaily(); } };
 $('cPrev').onclick = () => shiftMonth(-1);
+$('moPrev').onclick = () => { MO = moShift(MO, -1); renderMonth(); };
+$('moNext').onclick = () => { if (MO < today().slice(0, 7)) { MO = moShift(MO, 1); renderMonth(); } };
 $('dEditBtn').onclick = openEditor;
 $('cNext').onclick = () => shiftMonth(1);
 $('dNote').oninput = () => { const e = (D.data.days[D.date] ??= { v: {} }); e.note = $('dNote').value; e.at = new Date().toISOString(); markDirty(); };
@@ -1301,14 +1444,28 @@ $('btnFolder').onclick = async () => {
   renderVideoSettings();
 };
 $('btnAppStore').onclick = async () => { await S.vs.useApp(); toast('앞으로 영상은 앱 저장공간에 저장돼요. 폴더에 있던 영상은 그대로 남아 있어요.'); renderVideoSettings(); };
-$('mPractice').onclick = () => setMode('practice');
-$('mRef').onclick = () => setMode('ref');
-$('mModel').onclick = () => setMode('model');
+$('mPractice').onclick = () => { S.afterModel = false; setMode('practice'); };
+$('mRef').onclick = () => { S.afterModel = false; setMode('ref'); };
+$('mModel').onclick = () => { S.afterModel = false; setMode('model'); };
+$('btnCmpUp').onclick = () => {
+  const label = $('cmpLabel').value.trim();
+  if (!label) { toast('누구 영상인지 이름을 먼저 적어 주세요.'); $('cmpLabel').focus(); return; }
+  const pid = $('rSel').value;
+  if (S.pid !== pid) setPoomsae(pid);
+  setMode('model'); $('mLabel').value = label;
+  S.afterModel = true;
+  $('fileIn').click(); // 버튼을 누른 순간 안에서 열어야 파일 선택 창이 뜬다
+};
 $('btnCam').onclick = () => { if (S.stream) closeShoot(); else if (!needLabel()) openShoot(); };
 $('btnClose').onclick = closeShoot;
 $('btnRec').onclick = () => (S.rec === 'idle' ? startCountdown() : stopRecording());
 document.querySelector('label[for="fileIn"]').addEventListener('click', (e) => { if (needLabel()) e.preventDefault(); });
-$('fileIn').onchange = (e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f && !needLabel()) analyzeFile(f); };
+$('fileIn').onchange = (e) => {
+  const f = e.target.files?.[0]; e.target.value = '';
+  if (!f || needLabel()) return;
+  if (S.afterModel) show('practice'); // 분석 진행 화면은 품새 탭에 있음
+  analyzeFile(f);
+};
 $('btnFlip').onclick = () => { S.facing = S.facing === 'user' ? 'environment' : 'user'; if (S.stream) startCamera(); };
 $('btnSave').onclick = async () => {
   const s = { owner: $('sOwner').value.trim(), repo: $('sRepo').value.trim(), branch: $('sBranch').value.trim(), token: $('sToken').value.trim() };
